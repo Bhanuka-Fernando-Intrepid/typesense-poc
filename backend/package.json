@@ -1,0 +1,33 @@
+{
+  "name": "typesense-poc",
+  "version": "1.0.0",
+  "description": "POC to evaluate Typesense as an alternative to Algolia for indexing, search, filtering, and sorting.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "create:collection": "node scripts/createCollection.js",
+    "import:data": "node scripts/importData.js",
+    "test:search": "node scripts/searchTest.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Bhanuka-Fernando-Intrepid/typesense-poc.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Bhanuka-Fernando-Intrepid/typesense-poc/issues"
+  },
+  "homepage": "https://github.com/Bhanuka-Fernando-Intrepid/typesense-poc#readme",
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "typesense": "^3.0.6"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
