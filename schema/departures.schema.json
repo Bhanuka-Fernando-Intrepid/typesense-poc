@@ -1,0 +1,30 @@
+{
+  "name": "departures",
+  "fields": [
+    { "name": "id", "type": "string" },
+
+    { "name": "name", "type": "string" },
+    { "name": "primaryCountry", "type": "string", "facet": true },
+
+    { "name": "destinations", "type": "string[]", "facet": true },
+    { "name": "marketingRegions", "type": "string[]", "facet": true },
+    { "name": "themes", "type": "string[]", "facet": true },
+    { "name": "styles", "type": "string[]", "facet": true },
+    { "name": "locations", "type": "string[]" },
+    { "name": "regions", "type": "string[]", "facet": true },
+
+    { "name": "duration", "type": "int32" },
+    { "name": "physicalRating", "type": "int32" },
+
+    { "name": "marketingRating", "type": "int32" },
+    { "name": "reviewRating", "type": "float" },
+    { "name": "reviewCount", "type": "int32" },
+
+    { "name": "hasPlacesLeft", "type": "bool", "facet": true },
+    { "name": "placesLeft", "type": "int32" },
+
+    { "name": "startDate", "type": "int64" },
+    { "name": "endDate", "type": "int64" }
+  ],
+  "default_sorting_field": "marketingRating"
+}
