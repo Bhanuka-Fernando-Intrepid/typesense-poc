@@ -16,17 +16,38 @@ const typesenseClient = new Typesense.Client({
 
 const CARD_IMAGES = ['image-1', 'image-2', 'image-3', 'image-4']
 
+const REGION_CONFIG = [
+  { label: 'Australia', currency: 'aud' },
+  { label: 'Belgium', currency: 'eur' },
+  { label: 'Canada', currency: 'cad' },
+  { label: 'Europe', currency: 'eur' },
+  { label: 'Germany', currency: 'eur' },
+  { label: 'Global', currency: 'usd' },
+  { label: 'Ireland', currency: 'eur' },
+  { label: 'Malta', currency: 'eur' },
+  { label: 'Netherlands', currency: 'eur' },
+  { label: 'New Zealand', currency: 'nzd' },
+  { label: 'South Africa', currency: 'zar' },
+  { label: 'Switzerland', currency: 'chf' },
+  { label: 'United Kingdom', currency: 'gbp' },
+  { label: 'United States', currency: 'usd' },
+]
+
 const SORT_OPTIONS = [
   {
-    label: 'Top rated by marketing',
-    value: 'marketingRating:desc',
+    label: 'Relevance',
+    value: '_text_match:desc',
   },
   {
-    label: 'Best review score',
-    value: 'reviewRating:desc',
+    label: 'Price (low to high)',
+    value: 'price_usd:asc',
   },
   {
-    label: 'Shortest duration',
+    label: 'Price (high to low)',
+    value: 'price_usd:desc',
+  },
+  {
+    label: 'Duration (short to long)',
     value: 'duration:asc',
   },
 ]
@@ -60,6 +81,30 @@ function formatPlacesLeft(value) {
   }
 
   return numericValue.toLocaleString()
+}
+
+function getLowestPrice(lowestPrice, currencyCode = 'usd') {
+  if (!lowestPrice || typeof lowestPrice !== 'object') {
+    return null
+  }
+
+  // Get price for the requested currency
+  const priceData = lowestPrice[currencyCode] || lowestPrice.usd || Object.values(lowestPrice)[0]
+  
+  if (!priceData) {
+    return null
+  }
+
+  // Return discount price if on sale, otherwise regular price
+  const price = priceData.onSale && priceData.discountPrice 
+    ? priceData.discountPrice 
+    : priceData.price
+
+  return {
+    price: price,
+    currency: priceData.currencyCode || currencyCode.toUpperCase(),
+    onSale: priceData.onSale ?? false,
+  }
 }
 
 function getPrimaryValue(values, fallback = 'Unknown') {
@@ -144,11 +189,28 @@ function App() {
   const [query, setQuery] = useState('')
   const [sortBy, setSortBy] = useState(SORT_OPTIONS[0].value)
   const [filters, setFilters] = useState(DEFAULT_FILTERS)
+  const [selectedRegion, setSelectedRegion] = useState('Germany')
   const [trips, setTrips] = useState([])
   const [facetCounts, setFacetCounts] = useState([])
   const [totalFound, setTotalFound] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
+
+  const selectedCurrency = useMemo(() => {
+    const region = REGION_CONFIG.find((r) => r.label === selectedRegion)
+    return region?.currency || 'usd'
+  }, [selectedRegion])
+
+  // Get the appropriate sort field based on selected currency
+  const adjustedSortBy = useMemo(() => {
+    if (!sortBy.includes('price_')) {
+      return sortBy
+    }
+    // Replace the default USD price field with the selected currency's field
+    const currencyField = `price_${selectedCurrency}`
+    const direction = sortBy.includes(':asc') ? ':asc' : ':desc'
+    return `${currencyField}${direction}`
+  }, [sortBy, selectedCurrency])
 
   const marketingRegionOptions = useMemo(
     () => getFacetOptions(facetCounts, 'marketingRegions'),
@@ -171,7 +233,7 @@ function App() {
         const response = await typesenseClient
           .collections('travel_departures')
           .documents()
-          .search(buildSearchQuery(query, sortBy, filters))
+          .search(buildSearchQuery(query, adjustedSortBy, filters))
 
         if (!isActive) {
           return
@@ -210,7 +272,7 @@ function App() {
       isActive = false
       window.clearTimeout(timer)
     }
-  }, [query, sortBy, filters])
+  }, [query, adjustedSortBy, filters, selectedCurrency])
 
   const clearFilters = () => {
     setFilters(DEFAULT_FILTERS)
@@ -263,6 +325,22 @@ function App() {
       </header>
 
       <main>
+        <section className="region-selector" aria-label="Select region">
+          <label htmlFor="region-dropdown">Change region</label>
+          <select
+            id="region-dropdown"
+            value={selectedRegion}
+            onChange={(event) => setSelectedRegion(event.target.value)}
+            className="region-dropdown"
+          >
+            {REGION_CONFIG.map((region) => (
+              <option key={region.label} value={region.label}>
+                {region.label}
+              </option>
+            ))}
+          </select>
+        </section>
+
         <section className="search-strip" aria-label="Search">
           <div className="search-pill">
             <div className="search-input">
@@ -497,6 +575,17 @@ function App() {
                             <strong>{formatPlacesLeft(trip.placesLeft)}</strong>
                           </div>
                         </div>
+
+                        {getLowestPrice(trip.lowestPrice, selectedCurrency)?.price ? (
+                          <div className={`price-display ${getLowestPrice(trip.lowestPrice, selectedCurrency).onSale ? 'on-sale' : ''}`}>
+                            <span className="price-label">Starting from</span>
+                            <div className="price-amount">
+                              {getLowestPrice(trip.lowestPrice, selectedCurrency).onSale && <span className="sale-badge">🔥 SALE</span>}
+                              <span className="currency">{getLowestPrice(trip.lowestPrice, selectedCurrency).currency}</span>
+                              <span className="amount">{Math.round(getLowestPrice(trip.lowestPrice, selectedCurrency).price)}</span>
+                            </div>
+                          </div>
+                        ) : null}
 
                         <div className="card-footer">
                           <span className="pill">{trip.closedForBooking ? 'Closed' : 'Open now'}</span>
