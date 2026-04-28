@@ -138,6 +138,43 @@ button {
   box-shadow: 0 12px 24px rgba(225, 6, 0, 0.18);
 }
 
+.region-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.region-selector label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.region-dropdown {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  font-size: 1rem;
+  color: var(--ink);
+  cursor: pointer;
+  max-width: 300px;
+  box-shadow: 0 2px 8px rgba(22, 24, 28, 0.06);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.region-dropdown:hover {
+  border-color: var(--ink-muted);
+  box-shadow: 0 4px 12px rgba(22, 24, 28, 0.12);
+}
+
+.region-dropdown:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(225, 6, 0, 0.1);
+}
+
 .search-strip {
   display: grid;
   gap: 18px;
@@ -439,6 +476,59 @@ button {
   display: block;
   color: var(--ink);
   font-size: 1rem;
+}
+
+.price-display {
+  background: #f5f5f5;
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 8px;
+  border: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.price-display.on-sale {
+  background: linear-gradient(135deg, #ffe8e8 0%, #fff5f0 100%);
+  border-color: var(--accent);
+}
+
+.price-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--ink-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.price-amount {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.currency {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.amount {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--accent);
+  font-family: 'Montserrat', system-ui, sans-serif;
+}
+
+.sale-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--accent);
+  padding: 3px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
 }
 
 .card-footer {
