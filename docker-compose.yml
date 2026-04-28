@@ -1,0 +1,35 @@
+version: "3.9"
+
+services:
+  typesense:
+    image: typesense/typesense:30.2
+    container_name: typesense-poc
+    restart: unless-stopped
+    ports:
+      - "8108:8108"
+    volumes:
+      - ./typesense-data:/data
+    environment:
+      TYPESENSE_DATA_DIR: /data
+      TYPESENSE_API_KEY: ${TYPESENSE_API_KEY}
+    command: >
+      --data-dir /data
+      --api-key=${TYPESENSE_API_KEY}
+      --enable-cors
+    networks:
+      - typesense-net
+
+  dashboard:
+    image: ghcr.io/bfritscher/typesense-dashboard:latest
+    container_name: typesense-dashboard
+    restart: unless-stopped
+    ports:
+      - "8109:80"
+    depends_on:
+      - typesense
+    networks:
+      - typesense-net
+
+networks:
+  typesense-net:
+    driver: bridge
