@@ -3,7 +3,7 @@ const client = require("../clients/typesenseClient");
 async function runSearchTests() {
   try {
     console.log("\n--- Test 1: Simple keyword search ---");
-    let res = await client.collections("departures")
+    let res = await client.collections("travel_departures")
       .documents()
       .search({
         q: "morocco",
@@ -12,7 +12,7 @@ async function runSearchTests() {
     console.log("Results:", res.hits.length);
 
     console.log("\n--- Test 2: Multi-keyword search ---");
-    res = await client.collections("departures")
+    res = await client.collections("travel_departures")
       .documents()
       .search({
         q: "premium japan",
@@ -21,7 +21,7 @@ async function runSearchTests() {
     console.log("Results:", res.hits.length);
 
     console.log("\n--- Test 3: Partial match ---");
-    res = await client.collections("departures")
+    res = await client.collections("travel_departures")
       .documents()
       .search({
         q: "bal",
@@ -30,7 +30,7 @@ async function runSearchTests() {
     console.log("Results:", res.hits.length);
 
     console.log("\n--- Test 4: No match case ---");
-    res = await client.collections("departures")
+    res = await client.collections("travel_departures")
       .documents()
       .search({
         q: "xyz123",
@@ -49,7 +49,7 @@ runSearchTests();
 async function runFilterSortTests() {
   try {
     console.log("\n--- Test 1: Filter by marketing region = Africa ---");
-    let res = await client.collections("departures").documents().search({
+    let res = await client.collections("travel_departures").documents().search({
       q: "*",
       query_by: "name",
       filter_by: "marketingRegions:=Africa",
@@ -62,7 +62,7 @@ async function runFilterSortTests() {
     });
 
     console.log("\n--- Test 2: Filter by style = Premium ---");
-    res = await client.collections("departures").documents().search({
+    res = await client.collections("travel_departures").documents().search({
       q: "*",
       query_by: "name",
       filter_by: "styles:=Premium",
@@ -75,7 +75,7 @@ async function runFilterSortTests() {
     });
 
     console.log("\n--- Test 3: Filter available departures only ---");
-    res = await client.collections("departures").documents().search({
+    res = await client.collections("travel_departures").documents().search({
       q: "*",
       query_by: "name",
       filter_by: "hasPlacesLeft:=true && closedForBooking:=false",
@@ -88,7 +88,7 @@ async function runFilterSortTests() {
     });
 
     console.log("\n--- Test 4: Sort by shortest duration ---");
-    res = await client.collections("departures").documents().search({
+    res = await client.collections("travel_departures").documents().search({
       q: "*",
       query_by: "name",
       sort_by: "duration:asc",
@@ -100,7 +100,7 @@ async function runFilterSortTests() {
     });
 
     console.log("\n--- Test 5: Search Morocco + sort by marketingRating ---");
-    res = await client.collections("departures").documents().search({
+    res = await client.collections("travel_departures").documents().search({
       q: "morocco",
       query_by: "name,primaryCountry,locations",
       sort_by: "marketingRating:desc",

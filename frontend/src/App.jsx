@@ -169,7 +169,7 @@ function App() {
 
       try {
         const response = await typesenseClient
-          .collections('departures')
+          .collections('travel_departures')
           .documents()
           .search(buildSearchQuery(query, sortBy, filters))
 

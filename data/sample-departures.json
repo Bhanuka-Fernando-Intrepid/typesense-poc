@@ -1,242 +1,2380 @@
 [
   {
-    "id": "2680603",
-    "objectID": "2680603",
-    "name": "Classic Morocco",
-    "departureId": 2680603,
-    "productId": 166469,
-    "productCode": "XMKN",
-    "productUrl": "/morocco/classic-morocco-166469",
     "primaryCountry": "Morocco",
-    "destinations": ["Morocco"],
-    "marketingRegions": ["Africa"],
-    "themes": ["Explorer"],
-    "styles": ["Comfort"],
-    "locations": ["Casablanca", "Marrakech", "Fes", "Moulay Idriss", "Volubilis", "Merzouga", "Sahara Desert"],
-    "startCity": "Casablanca",
+    "destinations": [
+      "Morocco"
+    ],
+    "marketingRegions": [
+      "Africa"
+    ],
+    "themes": [
+      "Short breaks"
+    ],
+    "styles": [
+      "Original"
+    ],
+    "name": "Morocco Short Break: Marrakech to the Sahara",
+    "locations": [
+      "Marrakech",
+      "Todra Gorge",
+      "Merzouga"
+    ],
+    "startCity": "Marrakech",
     "endCity": "Marrakech",
-    "regions": ["Sahara Desert"],
-    "subdivisions": ["Casablanca-Settat", "Marrakech-Safi"],
-    "activities": ["Complimentary Arrival Transfer", "Casablanca - Hassan II Mosque"],
-    "marketingRating": 89,
+    "regions": [
+      "Sahara Desert"
+    ],
+    "subdivisions": [
+      "Marrakech-Safi"
+    ],
+    "activities": [
+      "Kasbah Ait Benhaddou visit",
+      "Tawesna association visit and lunch",
+      "Todra Gorges visit",
+      "Local Amazigh Brunch in the valley",
+      "Sunset camel ride",
+      "Dinner at camp",
+      "Breakfast at camp",
+      "Sunrise dune walk"
+    ],
+    "excludedSaleRegions": [],
+    "productCode": "XMHA",
+    "productId": 166431,
+    "marketingRating": 65,
     "hasPlacesLeft": true,
-    "startDate": 1780099200,
-    "endDate": 1780704000,
-    "duration": 8,
+    "closedForBooking": false,
+    "duration": 3,
     "physicalRating": 2,
-    "closedForBooking": false,
-    "placesLeft": 10,
-    "reviewCount": 739,
-    "reviewRating": 4.91
+    "promotions": [],
+    "subdivisionCountries": [
+      "Marrakech-Safi in Morocco"
+    ],
+    "tags": [],
+    "map": {
+      "alt": "Map of Morocco Short Break: Marrakech To The Sahara including Morocco",
+      "url": "/v3/assets/blt0de87ff52d9c34a8/blt61a67b2bdabcb1c0/649d285bda816067f620b752/XMHA-O-2023.gif",
+      "title": "Sahara-Mini-Adventures-Map - Map",
+      "width": 1100,
+      "height": 735
+    },
+    "placesLeft": 12,
+    "productUrl": "/morocco/morocco-short-break-marrakech-sahara-166431",
+    "reviewCount": 230,
+    "reviewRating": 4.87,
+    "productImages": [
+      {
+        "alt": "Travellers in Air Benhaddou, Morocco",
+        "url": "/v3/assets/blt0de87ff52d9c34a8/blt78ab000195df15a4/649d2863a90a3972117c96f9/Intrepid-Travel-Intrepid_Morocco23-Ait-Benhaddou_1100x735.jpg"
+      },
+      {
+        "alt": "Marrakesh, Morocco",
+        "url": "/v3/assets/blt0de87ff52d9c34a8/bltad432b9d3b25d959/649d286638309dc02f9de5b1/Intrepid-Travel-Intrepid_Morocco23_2409-1100x735.jpg"
+      },
+      {
+        "alt": "Group eating traditional food in Morocco",
+        "url": "/v3/assets/blt0de87ff52d9c34a8/blt45ba96355a089ea7/649d28694240034f7e2e5a72/Intrepid-Travel-Intrepid_Morocco23_9528-1100x735.jpg"
+      },
+      {
+        "alt": "Travellers in Ait Benhaddou, Morocco",
+        "url": "/v3/assets/blt0de87ff52d9c34a8/bltf408993a949bec8f/649d286d612b4a302994cef2/Intrepid-Travel-Intrepid_Morocco23-Ait-Benhaddou_1030-1100x735.jpg"
+      },
+      {
+        "alt": "Group of female travellers enjoying a drink in the Sahara desert while watching the sunset in Morocco",
+        "url": "/v3/assets/blt0de87ff52d9c34a8/bltd62b64b88451ea47/648fb86f99ff90956676c000/Intrepid_Travel-Morocco_Sahara_25-1100x735.jpg"
+      },
+      {
+        "alt": "Traveller in Todra Gorge, Morocco",
+        "url": "/v3/assets/blt0de87ff52d9c34a8/bltefe9d9567e6e0c47/649d28768a2efe48244dd8f0/Intrepid-Travel-MOROCCO_TODRA_traveller_happy-1100x735.jpg"
+      },
+      {
+        "alt": "Sahara Sunrise, Morocco",
+        "url": "/v3/assets/blt0de87ff52d9c34a8/bltd69c7b25bb9d2a08/649d28794240034bac2e5a76/Morocco-Sahara-sunrise-1100x735.jpg"
+      }
+    ],
+    "objectID": "2679227",
+    "departureId": 2679227,
+    "startDate": 1778371200,
+    "endDate": 1778544000,
+    "lowestPrice": {
+      "aud": {
+        "type": "twin",
+        "price": 415,
+        "onSale": true,
+        "currencyCode": "AUD",
+        "depositAmount": 400,
+        "discountPrice": 352.75,
+        "isHighlightedDeal": true,
+        "isHighlightedPrice": false
+      },
+      "cad": {
+        "type": "twin",
+        "price": 360,
+        "onSale": true,
+        "currencyCode": "CAD",
+        "depositAmount": 400,
+        "discountPrice": 324,
+        "isHighlightedDeal": true,
+        "isHighlightedPrice": false
+      },
+      "chf": {
+        "type": "twin",
+        "price": 210,
+        "onSale": true,
+        "currencyCode": "CHF",
+        "depositAmount": 400,
+        "discountPrice": 178.5,
+        "isHighlightedDeal": true,
+        "isHighlightedPrice": false
+      },
+      "eur": {
+        "type": "twin",
+        "price": 230,
+        "onSale": true,
+        "currencyCode": "EUR",
+        "depositAmount": 400,
+        "discountPrice": 195.5,
+        "isHighlightedDeal": true,
+        "isHighlightedPrice": false
+      },
+      "gbp": {
+        "type": "twin",
+        "price": 180,
+        "onSale": true,
+        "currencyCode": "GBP",
+        "depositAmount": 200,
+        "discountPrice": 153,
+        "isHighlightedDeal": true,
+        "isHighlightedPrice": false
+      },
+      "nzd": {
+        "type": "twin",
+        "price": 445,
+        "onSale": true,
+        "currencyCode": "NZD",
+        "depositAmount": 400,
+        "discountPrice": 378.25,
+        "isHighlightedDeal": true,
+        "isHighlightedPrice": false
+      },
+      "usd": {
+        "type": "twin",
+        "price": 320,
+        "onSale": true,
+        "currencyCode": "USD",
+        "depositAmount": 400,
+        "discountPrice": 288,
+        "isHighlightedDeal": true,
+        "isHighlightedPrice": false
+      },
+      "zar": {
+        "type": "twin",
+        "price": 4785,
+        "onSale": true,
+        "currencyCode": "ZAR",
+        "depositAmount": 4000,
+        "discountPrice": 4067.25,
+        "isHighlightedDeal": true,
+        "isHighlightedPrice": false
+      }
+    },
+    "id": "2679227",
+    "geoloc": [
+      [
+        31.6294723,
+        -7.9810845
+      ],
+      [
+        31.5903,
+        -5.5945
+      ],
+      [
+        31.0993,
+        -4.0116
+      ]
+    ],
+    "mapUrl": "/v3/assets/blt0de87ff52d9c34a8/blt61a67b2bdabcb1c0/649d285bda816067f620b752/XMHA-O-2023.gif",
+    "mapAlt": "Map of Morocco Short Break: Marrakech To The Sahara including Morocco",
+    "mapTitle": "Sahara-Mini-Adventures-Map - Map",
+    "productImageUrls": [
+      "/v3/assets/blt0de87ff52d9c34a8/blt78ab000195df15a4/649d2863a90a3972117c96f9/Intrepid-Travel-Intrepid_Morocco23-Ait-Benhaddou_1100x735.jpg",
+      "/v3/assets/blt0de87ff52d9c34a8/bltad432b9d3b25d959/649d286638309dc02f9de5b1/Intrepid-Travel-Intrepid_Morocco23_2409-1100x735.jpg",
+      "/v3/assets/blt0de87ff52d9c34a8/blt45ba96355a089ea7/649d28694240034f7e2e5a72/Intrepid-Travel-Intrepid_Morocco23_9528-1100x735.jpg",
+      "/v3/assets/blt0de87ff52d9c34a8/bltf408993a949bec8f/649d286d612b4a302994cef2/Intrepid-Travel-Intrepid_Morocco23-Ait-Benhaddou_1030-1100x735.jpg",
+      "/v3/assets/blt0de87ff52d9c34a8/bltd62b64b88451ea47/648fb86f99ff90956676c000/Intrepid_Travel-Morocco_Sahara_25-1100x735.jpg",
+      "/v3/assets/blt0de87ff52d9c34a8/bltefe9d9567e6e0c47/649d28768a2efe48244dd8f0/Intrepid-Travel-MOROCCO_TODRA_traveller_happy-1100x735.jpg",
+      "/v3/assets/blt0de87ff52d9c34a8/bltd69c7b25bb9d2a08/649d28794240034bac2e5a76/Morocco-Sahara-sunrise-1100x735.jpg"
+    ],
+    "productImageAlts": [
+      "Travellers in Air Benhaddou, Morocco",
+      "Marrakesh, Morocco",
+      "Group eating traditional food in Morocco",
+      "Travellers in Ait Benhaddou, Morocco",
+      "Group of female travellers enjoying a drink in the Sahara desert while watching the sunset in Morocco",
+      "Traveller in Todra Gorge, Morocco",
+      "Sahara Sunrise, Morocco"
+    ],
+    "heroImageUrl": "/v3/assets/blt0de87ff52d9c34a8/blt78ab000195df15a4/649d2863a90a3972117c96f9/Intrepid-Travel-Intrepid_Morocco23-Ait-Benhaddou_1100x735.jpg",
+    "heroImageAlt": "Travellers in Air Benhaddou, Morocco",
+    "price_aud": 415,
+    "discount_price_aud": 352.75,
+    "deposit_amount_aud": 400,
+    "on_sale_aud": true,
+    "highlighted_deal_aud": true,
+    "highlighted_price_aud": false,
+    "price_cad": 360,
+    "discount_price_cad": 324,
+    "deposit_amount_cad": 400,
+    "on_sale_cad": true,
+    "highlighted_deal_cad": true,
+    "highlighted_price_cad": false,
+    "price_chf": 210,
+    "discount_price_chf": 178.5,
+    "deposit_amount_chf": 400,
+    "on_sale_chf": true,
+    "highlighted_deal_chf": true,
+    "highlighted_price_chf": false,
+    "price_eur": 230,
+    "discount_price_eur": 195.5,
+    "deposit_amount_eur": 400,
+    "on_sale_eur": true,
+    "highlighted_deal_eur": true,
+    "highlighted_price_eur": false,
+    "price_gbp": 180,
+    "discount_price_gbp": 153,
+    "deposit_amount_gbp": 200,
+    "on_sale_gbp": true,
+    "highlighted_deal_gbp": true,
+    "highlighted_price_gbp": false,
+    "price_nzd": 445,
+    "discount_price_nzd": 378.25,
+    "deposit_amount_nzd": 400,
+    "on_sale_nzd": true,
+    "highlighted_deal_nzd": true,
+    "highlighted_price_nzd": false,
+    "price_usd": 320,
+    "discount_price_usd": 288,
+    "deposit_amount_usd": 400,
+    "on_sale_usd": true,
+    "highlighted_deal_usd": true,
+    "highlighted_price_usd": false,
+    "price_zar": 4785,
+    "discount_price_zar": 4067.25,
+    "deposit_amount_zar": 4000,
+    "on_sale_zar": true,
+    "highlighted_deal_zar": true,
+    "highlighted_price_zar": false
   },
   {
-    "id": "2715589",
-    "objectID": "2715589",
-    "name": "Inca Trail Express",
-    "departureId": 2715589,
-    "productId": 166999,
-    "productCode": "GGTA",
-    "productUrl": "/peru/inca-trail-express-166999",
-    "primaryCountry": "Peru",
-    "destinations": ["Peru"],
-    "marketingRegions": ["South America"],
-    "themes": ["Walking & trekking"],
-    "styles": ["Original"],
-    "locations": ["Cusco", "Ollantaytambo", "Inca Trail", "Machu Picchu"],
-    "startCity": "Cusco",
-    "endCity": "Cusco",
-    "regions": ["Latin America"],
-    "subdivisions": ["Cusco"],
-    "activities": ["Cusco - Leader-led orientation walk", "Sacred Valley - Community visit & lunch"],
-    "marketingRating": 89,
-    "hasPlacesLeft": true,
-    "startDate": 1784678400,
-    "endDate": 1785196800,
-    "duration": 7,
-    "physicalRating": 4,
-    "closedForBooking": false,
-    "placesLeft": 14,
-    "reviewCount": 751,
-    "reviewRating": 4.91
-  },
-  {
-    "id": "2680829",
-    "objectID": "2680829",
-    "name": "Premium Morocco in Depth",
-    "departureId": 2680829,
-    "productId": 166470,
-    "productCode": "XMPE",
-    "productUrl": "/morocco/premium-morocco-depth-166470",
     "primaryCountry": "Morocco",
-    "destinations": ["Morocco"],
-    "marketingRegions": ["Africa"],
-    "themes": ["Explorer"],
-    "styles": ["Premium"],
-    "locations": ["Casablanca", "Marrakech", "Meknes", "Rabat", "Volubilis", "Chefchaouen", "Fes", "Erfoud", "Sahara Desert", "Merzouga"],
-    "startCity": "Casablanca",
+    "destinations": [
+      "Morocco"
+    ],
+    "marketingRegions": [
+      "Africa"
+    ],
+    "themes": [
+      "Short breaks"
+    ],
+    "styles": [
+      "Original"
+    ],
+    "name": "Morocco Short Break: Marrakech to the Sahara",
+    "locations": [
+      "Marrakech",
+      "Todra Gorge",
+      "Merzouga"
+    ],
+    "startCity": "Marrakech",
     "endCity": "Marrakech",
+    "regions": [
+      "Sahara Desert"
+    ],
+    "subdivisions": [
+      "Marrakech-Safi"
+    ],
+    "activities": [
+      "Kasbah Ait Benhaddou visit",
+      "Tawesna association visit and lunch",
+      "Todra Gorges visit",
+      "Local Amazigh Brunch in the valley",
+      "Sunset camel ride",
+      "Dinner at camp",
+      "Breakfast at camp",
+      "Sunrise dune walk"
+    ],
+    "excludedSaleRegions": [],
+    "productCode": "XMHA",
+    "productId": 166431,
+    "marketingRating": 65,
+    "hasPlacesLeft": true,
+    "closedForBooking": false,
+    "duration": 3,
+    "physicalRating": 2,
+    "promotions": [],
+    "subdivisionCountries": [
+      "Marrakech-Safi in Morocco"
+    ],
+    "tags": [],
+    "map": {
+      "alt": "Map of Morocco Short Break: Marrakech To The Sahara including Morocco",
+      "url": "/v3/assets/blt0de87ff52d9c34a8/blt61a67b2bdabcb1c0/649d285bda816067f620b752/XMHA-O-2023.gif",
+      "title": "Sahara-Mini-Adventures-Map - Map",
+      "width": 1100,
+      "height": 735
+    },
+    "placesLeft": 12,
+    "productUrl": "/morocco/morocco-short-break-marrakech-sahara-166431",
+    "reviewCount": 230,
+    "reviewRating": 4.87,
+    "productImages": [
+      {
+        "alt": "Travellers in Air Benhaddou, Morocco",
+        "url": "/v3/assets/blt0de87ff52d9c34a8/blt78ab000195df15a4/649d2863a90a3972117c96f9/Intrepid-Travel-Intrepid_Morocco23-Ait-Benhaddou_1100x735.jpg"
+      },
+      {
+        "alt": "Marrakesh, Morocco",
+        "url": "/v3/assets/blt0de87ff52d9c34a8/bltad432b9d3b25d959/649d286638309dc02f9de5b1/Intrepid-Travel-Intrepid_Morocco23_2409-1100x735.jpg"
+      },
+      {
+        "alt": "Group eating traditional food in Morocco",
+        "url": "/v3/assets/blt0de87ff52d9c34a8/blt45ba96355a089ea7/649d28694240034f7e2e5a72/Intrepid-Travel-Intrepid_Morocco23_9528-1100x735.jpg"
+      },
+      {
+        "alt": "Travellers in Ait Benhaddou, Morocco",
+        "url": "/v3/assets/blt0de87ff52d9c34a8/bltf408993a949bec8f/649d286d612b4a302994cef2/Intrepid-Travel-Intrepid_Morocco23-Ait-Benhaddou_1030-1100x735.jpg"
+      },
+      {
+        "alt": "Group of female travellers enjoying a drink in the Sahara desert while watching the sunset in Morocco",
+        "url": "/v3/assets/blt0de87ff52d9c34a8/bltd62b64b88451ea47/648fb86f99ff90956676c000/Intrepid_Travel-Morocco_Sahara_25-1100x735.jpg"
+      },
+      {
+        "alt": "Traveller in Todra Gorge, Morocco",
+        "url": "/v3/assets/blt0de87ff52d9c34a8/bltefe9d9567e6e0c47/649d28768a2efe48244dd8f0/Intrepid-Travel-MOROCCO_TODRA_traveller_happy-1100x735.jpg"
+      },
+      {
+        "alt": "Sahara Sunrise, Morocco",
+        "url": "/v3/assets/blt0de87ff52d9c34a8/bltd69c7b25bb9d2a08/649d28794240034bac2e5a76/Morocco-Sahara-sunrise-1100x735.jpg"
+      }
+    ],
+    "objectID": "2679239",
+    "departureId": 2679239,
+    "startDate": 1780790400,
+    "endDate": 1780963200,
+    "lowestPrice": {
+      "aud": {
+        "type": "twin",
+        "price": 435,
+        "onSale": true,
+        "currencyCode": "AUD",
+        "depositAmount": 400,
+        "discountPrice": 348,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      },
+      "cad": {
+        "type": "twin",
+        "price": 375,
+        "onSale": true,
+        "currencyCode": "CAD",
+        "depositAmount": 400,
+        "discountPrice": 337.5,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      },
+      "chf": {
+        "type": "twin",
+        "price": 220,
+        "onSale": true,
+        "currencyCode": "CHF",
+        "depositAmount": 400,
+        "discountPrice": 176,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      },
+      "eur": {
+        "type": "twin",
+        "price": 240,
+        "onSale": true,
+        "currencyCode": "EUR",
+        "depositAmount": 400,
+        "discountPrice": 192,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      },
+      "gbp": {
+        "type": "twin",
+        "price": 195,
+        "onSale": true,
+        "currencyCode": "GBP",
+        "depositAmount": 200,
+        "discountPrice": 156,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      },
+      "nzd": {
+        "type": "twin",
+        "price": 465,
+        "onSale": true,
+        "currencyCode": "NZD",
+        "depositAmount": 400,
+        "discountPrice": 372,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      },
+      "usd": {
+        "type": "twin",
+        "price": 330,
+        "onSale": true,
+        "currencyCode": "USD",
+        "depositAmount": 400,
+        "discountPrice": 297,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      },
+      "zar": {
+        "type": "twin",
+        "price": 4995,
+        "onSale": true,
+        "currencyCode": "ZAR",
+        "depositAmount": 4000,
+        "discountPrice": 3996,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      }
+    },
+    "id": "2679239",
+    "geoloc": [
+      [
+        31.6294723,
+        -7.9810845
+      ],
+      [
+        31.5903,
+        -5.5945
+      ],
+      [
+        31.0993,
+        -4.0116
+      ]
+    ],
+    "mapUrl": "/v3/assets/blt0de87ff52d9c34a8/blt61a67b2bdabcb1c0/649d285bda816067f620b752/XMHA-O-2023.gif",
+    "mapAlt": "Map of Morocco Short Break: Marrakech To The Sahara including Morocco",
+    "mapTitle": "Sahara-Mini-Adventures-Map - Map",
+    "productImageUrls": [
+      "/v3/assets/blt0de87ff52d9c34a8/blt78ab000195df15a4/649d2863a90a3972117c96f9/Intrepid-Travel-Intrepid_Morocco23-Ait-Benhaddou_1100x735.jpg",
+      "/v3/assets/blt0de87ff52d9c34a8/bltad432b9d3b25d959/649d286638309dc02f9de5b1/Intrepid-Travel-Intrepid_Morocco23_2409-1100x735.jpg",
+      "/v3/assets/blt0de87ff52d9c34a8/blt45ba96355a089ea7/649d28694240034f7e2e5a72/Intrepid-Travel-Intrepid_Morocco23_9528-1100x735.jpg",
+      "/v3/assets/blt0de87ff52d9c34a8/bltf408993a949bec8f/649d286d612b4a302994cef2/Intrepid-Travel-Intrepid_Morocco23-Ait-Benhaddou_1030-1100x735.jpg",
+      "/v3/assets/blt0de87ff52d9c34a8/bltd62b64b88451ea47/648fb86f99ff90956676c000/Intrepid_Travel-Morocco_Sahara_25-1100x735.jpg",
+      "/v3/assets/blt0de87ff52d9c34a8/bltefe9d9567e6e0c47/649d28768a2efe48244dd8f0/Intrepid-Travel-MOROCCO_TODRA_traveller_happy-1100x735.jpg",
+      "/v3/assets/blt0de87ff52d9c34a8/bltd69c7b25bb9d2a08/649d28794240034bac2e5a76/Morocco-Sahara-sunrise-1100x735.jpg"
+    ],
+    "productImageAlts": [
+      "Travellers in Air Benhaddou, Morocco",
+      "Marrakesh, Morocco",
+      "Group eating traditional food in Morocco",
+      "Travellers in Ait Benhaddou, Morocco",
+      "Group of female travellers enjoying a drink in the Sahara desert while watching the sunset in Morocco",
+      "Traveller in Todra Gorge, Morocco",
+      "Sahara Sunrise, Morocco"
+    ],
+    "heroImageUrl": "/v3/assets/blt0de87ff52d9c34a8/blt78ab000195df15a4/649d2863a90a3972117c96f9/Intrepid-Travel-Intrepid_Morocco23-Ait-Benhaddou_1100x735.jpg",
+    "heroImageAlt": "Travellers in Air Benhaddou, Morocco",
+    "price_aud": 435,
+    "discount_price_aud": 348,
+    "deposit_amount_aud": 400,
+    "on_sale_aud": true,
+    "highlighted_deal_aud": false,
+    "highlighted_price_aud": false,
+    "price_cad": 375,
+    "discount_price_cad": 337.5,
+    "deposit_amount_cad": 400,
+    "on_sale_cad": true,
+    "highlighted_deal_cad": false,
+    "highlighted_price_cad": false,
+    "price_chf": 220,
+    "discount_price_chf": 176,
+    "deposit_amount_chf": 400,
+    "on_sale_chf": true,
+    "highlighted_deal_chf": false,
+    "highlighted_price_chf": false,
+    "price_eur": 240,
+    "discount_price_eur": 192,
+    "deposit_amount_eur": 400,
+    "on_sale_eur": true,
+    "highlighted_deal_eur": false,
+    "highlighted_price_eur": false,
+    "price_gbp": 195,
+    "discount_price_gbp": 156,
+    "deposit_amount_gbp": 200,
+    "on_sale_gbp": true,
+    "highlighted_deal_gbp": false,
+    "highlighted_price_gbp": false,
+    "price_nzd": 465,
+    "discount_price_nzd": 372,
+    "deposit_amount_nzd": 400,
+    "on_sale_nzd": true,
+    "highlighted_deal_nzd": false,
+    "highlighted_price_nzd": false,
+    "price_usd": 330,
+    "discount_price_usd": 297,
+    "deposit_amount_usd": 400,
+    "on_sale_usd": true,
+    "highlighted_deal_usd": false,
+    "highlighted_price_usd": false,
+    "price_zar": 4995,
+    "discount_price_zar": 3996,
+    "deposit_amount_zar": 4000,
+    "on_sale_zar": true,
+    "highlighted_deal_zar": false,
+    "highlighted_price_zar": false
+  },
+  {
+    "name": "Best of Sri Lanka",
+    "productCode": "HPSH",
+    "productId": 166796,
+    "productUrl": "/sri-lanka/best-sri-lanka-166796",
+    "primaryCountry": "Sri Lanka",
+    "destinations": [
+      "Sri Lanka"
+    ],
+    "marketingRegions": [
+      "Asia"
+    ],
+    "themes": [
+      "Explorer"
+    ],
+    "styles": [
+      "Original"
+    ],
+    "locations": [
+      "Negombo",
+      "Colombo",
+      "Anuradhapura",
+      "Polonnaruwa",
+      "Dambulla",
+      "Sigiriya",
+      "Kandy",
+      "Bandarawela",
+      "Haputale",
+      "Udawalawe Jungle Camp",
+      "Mirissa",
+      "Galle"
+    ],
+    "startCity": "Negombo",
+    "endCity": "Colombo",
     "regions": [],
-    "subdivisions": ["Casablanca-Settat", "Marrakech-Safi"],
-    "activities": ["Complimentary Arrival Transfer", "Casablanca - Welcome Dinner", "Casablanca - Hassan II Mosque", "Rabat - Kasbah"],
-    "marketingRating": 87,
-    "hasPlacesLeft": true,
-    "startDate": 1779926400,
-    "endDate": 1781136000,
+    "subdivisions": [
+      "Western Province",
+      "North Central Province",
+      "Central Province",
+      "Uva Province",
+      "Southern Province"
+    ],
+    "activities": [
+      "Anuradhapura - Bodhi Tree Temple",
+      "Anuradhapura - Bike tour",
+      "Polonnaruwa - Bike Tour",
+      "Dambulla - Cave Temples",
+      "Zero Plastic Impact Centre visit, an Intrepid Foundation partner",
+      "Kandy - Temple of the Tooth",
+      "Sigiriya - Lion Rock Fortress Visit",
+      "Kandy - Tea factory visit",
+      "Bandarawela - Cooking demonstration & local meal",
+      "Kandy - Scenic train ride from Kandy to Bandarawela",
+      "Pekoe Trail",
+      "Galle - Walking tour",
+      "Galle - Beeralu lace weaving experience",
+      "Colombo - City tour by bus"
+    ],
+    "excludedSaleRegions": [],
+    "tags": [],
+    "lowestPrice": {
+      "aud": {
+        "type": "twin",
+        "price": 4335,
+        "onSale": false,
+        "currencyCode": "AUD",
+        "depositAmount": 400,
+        "discountPrice": 4335,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      },
+      "cad": {
+        "type": "twin",
+        "price": 3925,
+        "onSale": false,
+        "currencyCode": "CAD",
+        "depositAmount": 400,
+        "discountPrice": 3925,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      },
+      "chf": {
+        "type": "twin",
+        "price": 2315,
+        "onSale": false,
+        "currencyCode": "CHF",
+        "depositAmount": 400,
+        "discountPrice": 2315,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      },
+      "eur": {
+        "type": "twin",
+        "price": 2465,
+        "onSale": false,
+        "currencyCode": "EUR",
+        "depositAmount": 400,
+        "discountPrice": 2465,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      },
+      "gbp": {
+        "type": "twin",
+        "price": 2125,
+        "onSale": false,
+        "currencyCode": "GBP",
+        "depositAmount": 200,
+        "discountPrice": 2125,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      },
+      "nzd": {
+        "type": "twin",
+        "price": 4760,
+        "onSale": false,
+        "currencyCode": "NZD",
+        "depositAmount": 400,
+        "discountPrice": 4760,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      },
+      "usd": {
+        "type": "twin",
+        "price": 3335,
+        "onSale": false,
+        "currencyCode": "USD",
+        "depositAmount": 400,
+        "discountPrice": 3335,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      },
+      "zar": {
+        "type": "twin",
+        "price": 52270,
+        "onSale": false,
+        "currencyCode": "ZAR",
+        "depositAmount": 4000,
+        "discountPrice": 52270,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      }
+    },
+    "closedForBooking": false,
     "duration": 15,
-    "physicalRating": 2,
-    "closedForBooking": false,
-    "placesLeft": 11,
-    "reviewCount": 682,
-    "reviewRating": 4.92
-  },
-  {
-    "id": "2659455",
-    "objectID": "2659455",
-    "name": "Costa Rica Experience",
-    "departureId": 2659455,
-    "productId": 167215,
-    "productCode": "QVSS",
-    "productUrl": "/costa-rica/costa-rica-experience-167215",
-    "primaryCountry": "Costa Rica",
-    "destinations": ["Costa Rica"],
-    "marketingRegions": ["Central America"],
-    "themes": ["Explorer", "Wildlife"],
-    "styles": ["Original"],
-    "locations": ["San Jose", "La Fortuna", "Alajuela", "Monteverde", "Quepos", "Manuel Antonio National Park"],
-    "startCity": "San Jose",
-    "endCity": "San Jose",
-    "regions": ["Latin America"],
-    "subdivisions": ["San Jose", "Alajuela", "Puntarenas"],
-    "activities": ["Alajuela - Tesoro Escondido Waterfall", "Monteverde Cloud Forest Visit", "Manuel Antonio National Park"],
-    "marketingRating": 84,
+    "physicalRating": 3,
+    "promotions": [],
+    "subdivisionCountries": [
+      "Western Province in Sri Lanka",
+      "North Central Province in Sri Lanka",
+      "Central Province in Sri Lanka",
+      "Uva Province in Sri Lanka",
+      "Southern Province in Sri Lanka"
+    ],
+    "map": {
+      "alt": "Map of Best Of Sri Lanka including Sri Lanka",
+      "url": "/v3/assets/blt0de87ff52d9c34a8/bltc553b38dec1f8f0e/694103e2012066815931e5e1/HPSH_2026.gif",
+      "title": "HPSH_2026 - Map",
+      "width": 1100,
+      "height": 735
+    },
+    "placesLeft": 12,
+    "reviewCount": 617,
+    "reviewRating": 4.9,
     "hasPlacesLeft": true,
-    "startDate": 1784332800,
-    "endDate": 1784937600,
-    "duration": 8,
-    "physicalRating": 2,
-    "closedForBooking": false,
-    "placesLeft": 8,
-    "reviewCount": 326,
-    "reviewRating": 4.87
+    "productImages": [
+      {
+        "alt": "Chats during Sigiriya sunset in Sri Lanka",
+        "url": "/v3/assets/blt0de87ff52d9c34a8/blted258f0aa85e3bb6/694103e41671cccaa793eca3/Intrepid-Travel-Sri-Lanka-Dambulla-Lion-Rock-Fortress-visit-leader-Dodan-travellers-Maz-and.jpg"
+      },
+      {
+        "alt": "sri lanka sigiriya lion rock fortress",
+        "url": "/v3/assets/blt0de87ff52d9c34a8/blte375c6998d3d4915/63c8a10490bfff5ce1d42ca8/sri-lanka-sigiriya-lion-rock-fortress.jpg"
+      },
+      {
+        "alt": "Group of travellers looking out on landscape from a scenic viewpoint on Sigiriya in Sri Lanka during an Intrepid Travel tour.",
+        "url": "/v3/assets/blt0de87ff52d9c34a8/blt3940ce33c92163f9/6743d2b3bd026a1383912ca8/Intrepid-Travel-Sri-lanka_dambulla_sigiriya-lion-rock-fortress_group.jpg"
+      },
+      {
+        "alt": "Traveller on a jungle walk in Sri Lanka",
+        "url": "/v3/assets/blt0de87ff52d9c34a8/bltf2976d569bacfbae/63c8a11d42a9271a2839c3e4/HPSH_sri-lanka_traveller_jungle.jpg"
+      },
+      {
+        "alt": "Traveller on from the outside of the Temple of the Tooth in Kandy, Sri Lanka on an Intrepid Travel tour.",
+        "url": "/v3/assets/blt0de87ff52d9c34a8/blt590c5bb5e876deea/63c8a109ba3c0a11eaa63c98/HPSH_sri-lanka_kandy_temple-of-the-tooth_traveller.jpg"
+      }
+    ],
+    "marketingRating": 90,
+    "objectID": "2793032",
+    "departureId": 2793032,
+    "startDate": 1830211200,
+    "endDate": 1831420800,
+    "id": "2793032",
+    "geoloc": [
+      [
+        7.209337,
+        79.834061
+      ],
+      [
+        6.9270786,
+        79.861243
+      ],
+      [
+        8.3148129,
+        80.4149319
+      ],
+      [
+        7.932857,
+        81.008087
+      ],
+      [
+        7.8566667,
+        80.6491667
+      ],
+      [
+        7.95,
+        80.75
+      ],
+      [
+        7.284459,
+        80.637459
+      ],
+      [
+        6.824508,
+        80.98587
+      ],
+      [
+        6.7677778,
+        80.9586111
+      ],
+      [
+        6.4403348,
+        80.8915311
+      ],
+      [
+        5.9447028,
+        80.4591608
+      ],
+      [
+        6.0535185,
+        80.2209773
+      ]
+    ],
+    "mapUrl": "/v3/assets/blt0de87ff52d9c34a8/bltc553b38dec1f8f0e/694103e2012066815931e5e1/HPSH_2026.gif",
+    "mapAlt": "Map of Best Of Sri Lanka including Sri Lanka",
+    "mapTitle": "HPSH_2026 - Map",
+    "productImageUrls": [
+      "/v3/assets/blt0de87ff52d9c34a8/blted258f0aa85e3bb6/694103e41671cccaa793eca3/Intrepid-Travel-Sri-Lanka-Dambulla-Lion-Rock-Fortress-visit-leader-Dodan-travellers-Maz-and.jpg",
+      "/v3/assets/blt0de87ff52d9c34a8/blte375c6998d3d4915/63c8a10490bfff5ce1d42ca8/sri-lanka-sigiriya-lion-rock-fortress.jpg",
+      "/v3/assets/blt0de87ff52d9c34a8/blt3940ce33c92163f9/6743d2b3bd026a1383912ca8/Intrepid-Travel-Sri-lanka_dambulla_sigiriya-lion-rock-fortress_group.jpg",
+      "/v3/assets/blt0de87ff52d9c34a8/bltf2976d569bacfbae/63c8a11d42a9271a2839c3e4/HPSH_sri-lanka_traveller_jungle.jpg",
+      "/v3/assets/blt0de87ff52d9c34a8/blt590c5bb5e876deea/63c8a109ba3c0a11eaa63c98/HPSH_sri-lanka_kandy_temple-of-the-tooth_traveller.jpg"
+    ],
+    "productImageAlts": [
+      "Chats during Sigiriya sunset in Sri Lanka",
+      "sri lanka sigiriya lion rock fortress",
+      "Group of travellers looking out on landscape from a scenic viewpoint on Sigiriya in Sri Lanka during an Intrepid Travel tour.",
+      "Traveller on a jungle walk in Sri Lanka",
+      "Traveller on from the outside of the Temple of the Tooth in Kandy, Sri Lanka on an Intrepid Travel tour."
+    ],
+    "heroImageUrl": "/v3/assets/blt0de87ff52d9c34a8/blted258f0aa85e3bb6/694103e41671cccaa793eca3/Intrepid-Travel-Sri-Lanka-Dambulla-Lion-Rock-Fortress-visit-leader-Dodan-travellers-Maz-and.jpg",
+    "heroImageAlt": "Chats during Sigiriya sunset in Sri Lanka",
+    "price_aud": 4335,
+    "discount_price_aud": 4335,
+    "deposit_amount_aud": 400,
+    "on_sale_aud": false,
+    "highlighted_deal_aud": false,
+    "highlighted_price_aud": false,
+    "price_cad": 3925,
+    "discount_price_cad": 3925,
+    "deposit_amount_cad": 400,
+    "on_sale_cad": false,
+    "highlighted_deal_cad": false,
+    "highlighted_price_cad": false,
+    "price_chf": 2315,
+    "discount_price_chf": 2315,
+    "deposit_amount_chf": 400,
+    "on_sale_chf": false,
+    "highlighted_deal_chf": false,
+    "highlighted_price_chf": false,
+    "price_eur": 2465,
+    "discount_price_eur": 2465,
+    "deposit_amount_eur": 400,
+    "on_sale_eur": false,
+    "highlighted_deal_eur": false,
+    "highlighted_price_eur": false,
+    "price_gbp": 2125,
+    "discount_price_gbp": 2125,
+    "deposit_amount_gbp": 200,
+    "on_sale_gbp": false,
+    "highlighted_deal_gbp": false,
+    "highlighted_price_gbp": false,
+    "price_nzd": 4760,
+    "discount_price_nzd": 4760,
+    "deposit_amount_nzd": 400,
+    "on_sale_nzd": false,
+    "highlighted_deal_nzd": false,
+    "highlighted_price_nzd": false,
+    "price_usd": 3335,
+    "discount_price_usd": 3335,
+    "deposit_amount_usd": 400,
+    "on_sale_usd": false,
+    "highlighted_deal_usd": false,
+    "highlighted_price_usd": false,
+    "price_zar": 52270,
+    "discount_price_zar": 52270,
+    "deposit_amount_zar": 4000,
+    "on_sale_zar": false,
+    "highlighted_deal_zar": false,
+    "highlighted_price_zar": false
   },
   {
-    "id": "2646889",
-    "objectID": "2646889",
-    "name": "Premium Japan",
-    "departureId": 2646889,
-    "productId": 166791,
-    "productCode": "CJPJ",
-    "productUrl": "/japan/premium-japan-166791",
+    "name": "Best of Sri Lanka",
+    "productCode": "HPSH",
+    "productId": 166796,
+    "productUrl": "/sri-lanka/best-sri-lanka-166796",
+    "primaryCountry": "Sri Lanka",
+    "destinations": [
+      "Sri Lanka"
+    ],
+    "marketingRegions": [
+      "Asia"
+    ],
+    "themes": [
+      "Explorer"
+    ],
+    "styles": [
+      "Original"
+    ],
+    "locations": [
+      "Negombo",
+      "Colombo",
+      "Anuradhapura",
+      "Polonnaruwa",
+      "Dambulla",
+      "Sigiriya",
+      "Kandy",
+      "Bandarawela",
+      "Haputale",
+      "Udawalawe Jungle Camp",
+      "Mirissa",
+      "Galle"
+    ],
+    "startCity": "Negombo",
+    "endCity": "Colombo",
+    "regions": [],
+    "subdivisions": [
+      "Western Province",
+      "North Central Province",
+      "Central Province",
+      "Uva Province",
+      "Southern Province"
+    ],
+    "activities": [
+      "Anuradhapura - Bodhi Tree Temple",
+      "Anuradhapura - Bike tour",
+      "Polonnaruwa - Bike Tour",
+      "Dambulla - Cave Temples",
+      "Zero Plastic Impact Centre visit, an Intrepid Foundation partner",
+      "Kandy - Temple of the Tooth",
+      "Sigiriya - Lion Rock Fortress Visit",
+      "Kandy - Tea factory visit",
+      "Bandarawela - Cooking demonstration & local meal",
+      "Kandy - Scenic train ride from Kandy to Bandarawela",
+      "Pekoe Trail",
+      "Galle - Walking tour",
+      "Galle - Beeralu lace weaving experience",
+      "Colombo - City tour by bus"
+    ],
+    "excludedSaleRegions": [],
+    "tags": [],
+    "lowestPrice": {
+      "aud": {
+        "type": "twin",
+        "price": 4335,
+        "onSale": false,
+        "currencyCode": "AUD",
+        "depositAmount": 400,
+        "discountPrice": 4335,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      },
+      "cad": {
+        "type": "twin",
+        "price": 3925,
+        "onSale": false,
+        "currencyCode": "CAD",
+        "depositAmount": 400,
+        "discountPrice": 3925,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      },
+      "chf": {
+        "type": "twin",
+        "price": 2315,
+        "onSale": false,
+        "currencyCode": "CHF",
+        "depositAmount": 400,
+        "discountPrice": 2315,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      },
+      "eur": {
+        "type": "twin",
+        "price": 2465,
+        "onSale": false,
+        "currencyCode": "EUR",
+        "depositAmount": 400,
+        "discountPrice": 2465,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      },
+      "gbp": {
+        "type": "twin",
+        "price": 2125,
+        "onSale": false,
+        "currencyCode": "GBP",
+        "depositAmount": 200,
+        "discountPrice": 2125,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      },
+      "nzd": {
+        "type": "twin",
+        "price": 4760,
+        "onSale": false,
+        "currencyCode": "NZD",
+        "depositAmount": 400,
+        "discountPrice": 4760,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      },
+      "usd": {
+        "type": "twin",
+        "price": 3335,
+        "onSale": false,
+        "currencyCode": "USD",
+        "depositAmount": 400,
+        "discountPrice": 3335,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      },
+      "zar": {
+        "type": "twin",
+        "price": 52270,
+        "onSale": false,
+        "currencyCode": "ZAR",
+        "depositAmount": 4000,
+        "discountPrice": 52270,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      }
+    },
+    "closedForBooking": false,
+    "duration": 15,
+    "physicalRating": 3,
+    "promotions": [],
+    "subdivisionCountries": [
+      "Western Province in Sri Lanka",
+      "North Central Province in Sri Lanka",
+      "Central Province in Sri Lanka",
+      "Uva Province in Sri Lanka",
+      "Southern Province in Sri Lanka"
+    ],
+    "map": {
+      "alt": "Map of Best Of Sri Lanka including Sri Lanka",
+      "url": "/v3/assets/blt0de87ff52d9c34a8/bltc553b38dec1f8f0e/694103e2012066815931e5e1/HPSH_2026.gif",
+      "title": "HPSH_2026 - Map",
+      "width": 1100,
+      "height": 735
+    },
+    "placesLeft": 12,
+    "reviewCount": 617,
+    "reviewRating": 4.9,
+    "hasPlacesLeft": true,
+    "productImages": [
+      {
+        "alt": "Chats during Sigiriya sunset in Sri Lanka",
+        "url": "/v3/assets/blt0de87ff52d9c34a8/blted258f0aa85e3bb6/694103e41671cccaa793eca3/Intrepid-Travel-Sri-Lanka-Dambulla-Lion-Rock-Fortress-visit-leader-Dodan-travellers-Maz-and.jpg"
+      },
+      {
+        "alt": "sri lanka sigiriya lion rock fortress",
+        "url": "/v3/assets/blt0de87ff52d9c34a8/blte375c6998d3d4915/63c8a10490bfff5ce1d42ca8/sri-lanka-sigiriya-lion-rock-fortress.jpg"
+      },
+      {
+        "alt": "Group of travellers looking out on landscape from a scenic viewpoint on Sigiriya in Sri Lanka during an Intrepid Travel tour.",
+        "url": "/v3/assets/blt0de87ff52d9c34a8/blt3940ce33c92163f9/6743d2b3bd026a1383912ca8/Intrepid-Travel-Sri-lanka_dambulla_sigiriya-lion-rock-fortress_group.jpg"
+      },
+      {
+        "alt": "Traveller on a jungle walk in Sri Lanka",
+        "url": "/v3/assets/blt0de87ff52d9c34a8/bltf2976d569bacfbae/63c8a11d42a9271a2839c3e4/HPSH_sri-lanka_traveller_jungle.jpg"
+      },
+      {
+        "alt": "Traveller on from the outside of the Temple of the Tooth in Kandy, Sri Lanka on an Intrepid Travel tour.",
+        "url": "/v3/assets/blt0de87ff52d9c34a8/blt590c5bb5e876deea/63c8a109ba3c0a11eaa63c98/HPSH_sri-lanka_kandy_temple-of-the-tooth_traveller.jpg"
+      }
+    ],
+    "marketingRating": 90,
+    "objectID": "2793033",
+    "departureId": 2793033,
+    "startDate": 1830124800,
+    "endDate": 1831334400,
+    "id": "2793033",
+    "geoloc": [
+      [
+        7.209337,
+        79.834061
+      ],
+      [
+        6.9270786,
+        79.861243
+      ],
+      [
+        8.3148129,
+        80.4149319
+      ],
+      [
+        7.932857,
+        81.008087
+      ],
+      [
+        7.8566667,
+        80.6491667
+      ],
+      [
+        7.95,
+        80.75
+      ],
+      [
+        7.284459,
+        80.637459
+      ],
+      [
+        6.824508,
+        80.98587
+      ],
+      [
+        6.7677778,
+        80.9586111
+      ],
+      [
+        6.4403348,
+        80.8915311
+      ],
+      [
+        5.9447028,
+        80.4591608
+      ],
+      [
+        6.0535185,
+        80.2209773
+      ]
+    ],
+    "mapUrl": "/v3/assets/blt0de87ff52d9c34a8/bltc553b38dec1f8f0e/694103e2012066815931e5e1/HPSH_2026.gif",
+    "mapAlt": "Map of Best Of Sri Lanka including Sri Lanka",
+    "mapTitle": "HPSH_2026 - Map",
+    "productImageUrls": [
+      "/v3/assets/blt0de87ff52d9c34a8/blted258f0aa85e3bb6/694103e41671cccaa793eca3/Intrepid-Travel-Sri-Lanka-Dambulla-Lion-Rock-Fortress-visit-leader-Dodan-travellers-Maz-and.jpg",
+      "/v3/assets/blt0de87ff52d9c34a8/blte375c6998d3d4915/63c8a10490bfff5ce1d42ca8/sri-lanka-sigiriya-lion-rock-fortress.jpg",
+      "/v3/assets/blt0de87ff52d9c34a8/blt3940ce33c92163f9/6743d2b3bd026a1383912ca8/Intrepid-Travel-Sri-lanka_dambulla_sigiriya-lion-rock-fortress_group.jpg",
+      "/v3/assets/blt0de87ff52d9c34a8/bltf2976d569bacfbae/63c8a11d42a9271a2839c3e4/HPSH_sri-lanka_traveller_jungle.jpg",
+      "/v3/assets/blt0de87ff52d9c34a8/blt590c5bb5e876deea/63c8a109ba3c0a11eaa63c98/HPSH_sri-lanka_kandy_temple-of-the-tooth_traveller.jpg"
+    ],
+    "productImageAlts": [
+      "Chats during Sigiriya sunset in Sri Lanka",
+      "sri lanka sigiriya lion rock fortress",
+      "Group of travellers looking out on landscape from a scenic viewpoint on Sigiriya in Sri Lanka during an Intrepid Travel tour.",
+      "Traveller on a jungle walk in Sri Lanka",
+      "Traveller on from the outside of the Temple of the Tooth in Kandy, Sri Lanka on an Intrepid Travel tour."
+    ],
+    "heroImageUrl": "/v3/assets/blt0de87ff52d9c34a8/blted258f0aa85e3bb6/694103e41671cccaa793eca3/Intrepid-Travel-Sri-Lanka-Dambulla-Lion-Rock-Fortress-visit-leader-Dodan-travellers-Maz-and.jpg",
+    "heroImageAlt": "Chats during Sigiriya sunset in Sri Lanka",
+    "price_aud": 4335,
+    "discount_price_aud": 4335,
+    "deposit_amount_aud": 400,
+    "on_sale_aud": false,
+    "highlighted_deal_aud": false,
+    "highlighted_price_aud": false,
+    "price_cad": 3925,
+    "discount_price_cad": 3925,
+    "deposit_amount_cad": 400,
+    "on_sale_cad": false,
+    "highlighted_deal_cad": false,
+    "highlighted_price_cad": false,
+    "price_chf": 2315,
+    "discount_price_chf": 2315,
+    "deposit_amount_chf": 400,
+    "on_sale_chf": false,
+    "highlighted_deal_chf": false,
+    "highlighted_price_chf": false,
+    "price_eur": 2465,
+    "discount_price_eur": 2465,
+    "deposit_amount_eur": 400,
+    "on_sale_eur": false,
+    "highlighted_deal_eur": false,
+    "highlighted_price_eur": false,
+    "price_gbp": 2125,
+    "discount_price_gbp": 2125,
+    "deposit_amount_gbp": 200,
+    "on_sale_gbp": false,
+    "highlighted_deal_gbp": false,
+    "highlighted_price_gbp": false,
+    "price_nzd": 4760,
+    "discount_price_nzd": 4760,
+    "deposit_amount_nzd": 400,
+    "on_sale_nzd": false,
+    "highlighted_deal_nzd": false,
+    "highlighted_price_nzd": false,
+    "price_usd": 3335,
+    "discount_price_usd": 3335,
+    "deposit_amount_usd": 400,
+    "on_sale_usd": false,
+    "highlighted_deal_usd": false,
+    "highlighted_price_usd": false,
+    "price_zar": 52270,
+    "discount_price_zar": 52270,
+    "deposit_amount_zar": 4000,
+    "on_sale_zar": false,
+    "highlighted_deal_zar": false,
+    "highlighted_price_zar": false
+  },
+  {
     "primaryCountry": "Japan",
-    "destinations": ["Japan"],
-    "marketingRegions": ["Asia"],
-    "themes": ["Explorer"],
-    "styles": ["Premium"],
-    "locations": ["Tokyo", "Kyoto", "Hakone", "Takayama", "Hiroshima", "Miyajima", "Himeji"],
+    "destinations": [
+      "Japan"
+    ],
+    "marketingRegions": [
+      "Asia"
+    ],
+    "themes": [
+      "Explorer"
+    ],
+    "styles": [
+      "Premium"
+    ],
+    "name": "Premium Highlights of Japan",
+    "locations": [
+      "Tokyo",
+      "Kyoto",
+      "Kamakura",
+      "Yudanaka",
+      "Kanazawa"
+    ],
     "startCity": "Tokyo",
     "endCity": "Kyoto",
     "regions": [],
-    "subdivisions": ["Tokyo", "Kanagawa", "Gifu", "Hiroshima", "Kyoto"],
-    "activities": ["Tokyo - Welcome dinner", "Tokyo - Sensoji Temple", "Tokyo - Shibuya walking tour", "Tokyo - Meiji Jingu Shrine"],
-    "marketingRating": 88,
+    "subdivisions": [
+      "Tokyo",
+      "Nagano",
+      "Ishikawa",
+      "Kyoto"
+    ],
+    "activities": [
+      "Tokyo - Welcome dinner",
+      "Tokyo - Authentic Samurai Experience",
+      "Tokyo - Sensoji Temple",
+      "Tokyo - River Cruise",
+      "Tokyo - Kamakura Day Trip",
+      "Kamakura - Enoden Ride",
+      "Kamakura - Rickshaw Ride",
+      "Kamakura - Kotoku-In temple",
+      "Yudanaka - Snow Monkey Park",
+      "Yudanaka - Onsen Experience",
+      "Kanazawa - Kenrokuen Garden",
+      "Kanazawa - Samurai District Walking Tour",
+      "Kanazawa - Higashi Chaya District walking tour",
+      "Kanazawa - Market Visit and Sushi Making Experience",
+      "Kyoto - Arashiyama Walking Tour",
+      "Kyoto - Gion Night walk",
+      "Kyoto - Yuzon Dyeing Workshop",
+      "Kyoto - Fushimi Inari - Taisha",
+      "Kyoto -Tea Ceremony"
+    ],
+    "excludedSaleRegions": [],
+    "productCode": "CJPH",
+    "productId": 166787,
+    "marketingRating": 73,
     "hasPlacesLeft": true,
-    "startDate": 1795910400,
-    "endDate": 1796860800,
-    "duration": 12,
-    "physicalRating": 2,
     "closedForBooking": false,
-    "placesLeft": 10,
-    "reviewCount": 336,
-    "reviewRating": 4.81
-  },
-  {
-    "id": "2681938",
-    "objectID": "2681938",
-    "name": "Morocco Uncovered",
-    "departureId": 2681938,
-    "productId": 166467,
-    "productCode": "XMKC",
-    "productUrl": "/morocco/morocco-uncovered-166467",
-    "primaryCountry": "Morocco",
-    "destinations": ["Morocco"],
-    "marketingRegions": ["Africa"],
-    "themes": ["Explorer"],
-    "styles": ["Comfort"],
-    "locations": ["Casablanca", "Marrakech", "Meknes", "Rabat", "Chefchaouen", "Volubilis", "Fes", "Midelt", "Sahara Desert", "M'goun"],
-    "startCity": "Casablanca",
-    "endCity": "Marrakech",
-    "regions": [],
-    "subdivisions": ["Casablanca-Settat", "Marrakech-Safi", "Souss-Massa"],
-    "activities": ["Complimentary Arrival Transfer", "Casablanca - Hassan II Mosque", "Rabat - Kasbah des Oudaias"],
-    "marketingRating": 92,
-    "hasPlacesLeft": true,
-    "startDate": 1780617600,
-    "endDate": 1781654400,
-    "duration": 13,
-    "physicalRating": 2,
-    "closedForBooking": false,
-    "placesLeft": 9,
-    "reviewCount": 1691,
-    "reviewRating": 4.92
-  },
-  {
-    "id": "2662388",
-    "objectID": "2662388",
-    "name": "Beautiful Bali",
-    "departureId": 2662388,
-    "productId": 166529,
-    "productCode": "TISA",
-    "productUrl": "/indonesia/beautiful-bali-166529",
-    "primaryCountry": "Indonesia",
-    "destinations": ["Indonesia"],
-    "marketingRegions": ["Asia"],
-    "themes": ["Explorer"],
-    "styles": ["Original"],
-    "locations": ["Ubud", "Sanur", "Undisan", "Sangeh", "Sibetan Village", "Mt Batur", "Lovina", "Banjar", "Bali Barat National Park"],
-    "startCity": "Ubud",
-    "endCity": "Sanur",
-    "regions": ["South East Asia"],
-    "subdivisions": ["Bali"],
-    "activities": ["Ubud - Campuhan Ridge & Village walk", "Bali - Kecak Fire Dance", "Ubud - Home visit"],
-    "marketingRating": 90,
-    "hasPlacesLeft": true,
-    "startDate": 1779235200,
-    "endDate": 1779926400,
     "duration": 9,
-    "physicalRating": 3,
-    "closedForBooking": false,
-    "placesLeft": 10,
-    "reviewCount": 893,
-    "reviewRating": 4.89
+    "physicalRating": 2,
+    "promotions": [],
+    "subdivisionCountries": [
+      "Tokyo in Japan",
+      "Nagano in Japan",
+      "Ishikawa in Japan",
+      "Kyoto in Japan"
+    ],
+    "tags": [],
+    "map": {
+      "alt": "Map of Premium Highlights Of Japan including Japan",
+      "url": "/v3/assets/blt0de87ff52d9c34a8/blte6b6c155077638d9/64eff2a2a9c2c320799c5530/CJPH_2024.gif",
+      "title": "CJPH 2024 - Map",
+      "width": 1100,
+      "height": 735
+    },
+    "productUrl": "/japan/premium-highlights-japan-166787",
+    "reviewCount": 57,
+    "reviewRating": 4.58,
+    "productImages": [
+      {
+        "alt": "Group of Intrepid travellers and leader exploring Sensoji Temple in downtown Tokyo",
+        "url": "/v3/assets/blt0de87ff52d9c34a8/blt08d14203a892a8be/65a1c9c32d0de385928f961f/Intrepid_Travel-Japan-Tokyo-Sensoji-temple-exploring-7.jpg"
+      },
+      {
+        "alt": "Japan, Kamakura, The Great Buddha",
+        "url": "/v3/assets/blt0de87ff52d9c34a8/blte7284cd0ffc58013/64eff2b3501047c501f81357/CJSH_Japan_Kamakura_The_Great_Buddha.jpg"
+      },
+      {
+        "alt": "Japanese macaques relaxing in a hot spring",
+        "url": "/v3/assets/blt0de87ff52d9c34a8/blt8be21af43fbb4980/64eff2aedaa16c7be0a5233d/Intrepid-Travel-Intrepid-Travel-Japan_Nagano_Snow-monkeys_ss_131685626.jpg"
+      },
+      {
+        "alt": "Group of Intrepid travellers and leader walking through Fushimi Inari gates in Kyoto",
+        "url": "/v3/assets/blt0de87ff52d9c34a8/bltec1a6a686b755fbc/65a1c9c4a44e3eed020e8a65/Intrepid_Travel-Japan-Kyoto-Fushimi-Inari-shrine-group-exploring-10.jpg"
+      },
+      {
+        "alt": "Arashiyama Bamboo grove",
+        "url": "/v3/assets/blt0de87ff52d9c34a8/blt00a9795dc58adff9/64eff2ba10408a3df126b03e/Intrepid-DMC-japan_kyoto_arashiyama_bamboo-grove.jpg"
+      }
+    ],
+    "objectID": "2642205",
+    "departureId": 2642205,
+    "startDate": 1787356800,
+    "endDate": 1788048000,
+    "lowestPrice": {
+      "aud": {
+        "type": "twin",
+        "price": 7060,
+        "onSale": false,
+        "currencyCode": "AUD",
+        "depositAmount": 400,
+        "discountPrice": 7060,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": true
+      },
+      "cad": {
+        "type": "twin",
+        "price": 7105,
+        "onSale": true,
+        "currencyCode": "CAD",
+        "depositAmount": 400,
+        "discountPrice": 5684,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": true
+      },
+      "chf": {
+        "type": "twin",
+        "price": 4175,
+        "onSale": false,
+        "currencyCode": "CHF",
+        "depositAmount": 400,
+        "discountPrice": 4175,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": true
+      },
+      "eur": {
+        "type": "twin",
+        "price": 4480,
+        "onSale": false,
+        "currencyCode": "EUR",
+        "depositAmount": 400,
+        "discountPrice": 4480,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": true
+      },
+      "gbp": {
+        "type": "twin",
+        "price": 3850,
+        "onSale": false,
+        "currencyCode": "GBP",
+        "depositAmount": 200,
+        "discountPrice": 3850,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": true
+      },
+      "nzd": {
+        "type": "twin",
+        "price": 8355,
+        "onSale": false,
+        "currencyCode": "NZD",
+        "depositAmount": 400,
+        "discountPrice": 8355,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": true
+      },
+      "usd": {
+        "type": "twin",
+        "price": 6855,
+        "onSale": true,
+        "currencyCode": "USD",
+        "depositAmount": 400,
+        "discountPrice": 5484,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": true
+      },
+      "zar": {
+        "type": "twin",
+        "price": 95710,
+        "onSale": false,
+        "currencyCode": "ZAR",
+        "depositAmount": 4000,
+        "discountPrice": 95710,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": true
+      }
+    },
+    "placesLeft": 11,
+    "id": "2642205",
+    "geoloc": [
+      [
+        35.6814,
+        139.7645
+      ],
+      [
+        35.0116363,
+        135.7680294
+      ],
+      [
+        35.3192128,
+        139.5466731
+      ],
+      [
+        36.7416383,
+        138.4147279
+      ],
+      [
+        36.5613254,
+        136.6562051
+      ]
+    ],
+    "mapUrl": "/v3/assets/blt0de87ff52d9c34a8/blte6b6c155077638d9/64eff2a2a9c2c320799c5530/CJPH_2024.gif",
+    "mapAlt": "Map of Premium Highlights Of Japan including Japan",
+    "mapTitle": "CJPH 2024 - Map",
+    "productImageUrls": [
+      "/v3/assets/blt0de87ff52d9c34a8/blt08d14203a892a8be/65a1c9c32d0de385928f961f/Intrepid_Travel-Japan-Tokyo-Sensoji-temple-exploring-7.jpg",
+      "/v3/assets/blt0de87ff52d9c34a8/blte7284cd0ffc58013/64eff2b3501047c501f81357/CJSH_Japan_Kamakura_The_Great_Buddha.jpg",
+      "/v3/assets/blt0de87ff52d9c34a8/blt8be21af43fbb4980/64eff2aedaa16c7be0a5233d/Intrepid-Travel-Intrepid-Travel-Japan_Nagano_Snow-monkeys_ss_131685626.jpg",
+      "/v3/assets/blt0de87ff52d9c34a8/bltec1a6a686b755fbc/65a1c9c4a44e3eed020e8a65/Intrepid_Travel-Japan-Kyoto-Fushimi-Inari-shrine-group-exploring-10.jpg",
+      "/v3/assets/blt0de87ff52d9c34a8/blt00a9795dc58adff9/64eff2ba10408a3df126b03e/Intrepid-DMC-japan_kyoto_arashiyama_bamboo-grove.jpg"
+    ],
+    "productImageAlts": [
+      "Group of Intrepid travellers and leader exploring Sensoji Temple in downtown Tokyo",
+      "Japan, Kamakura, The Great Buddha",
+      "Japanese macaques relaxing in a hot spring",
+      "Group of Intrepid travellers and leader walking through Fushimi Inari gates in Kyoto",
+      "Arashiyama Bamboo grove"
+    ],
+    "heroImageUrl": "/v3/assets/blt0de87ff52d9c34a8/blt08d14203a892a8be/65a1c9c32d0de385928f961f/Intrepid_Travel-Japan-Tokyo-Sensoji-temple-exploring-7.jpg",
+    "heroImageAlt": "Group of Intrepid travellers and leader exploring Sensoji Temple in downtown Tokyo",
+    "price_aud": 7060,
+    "discount_price_aud": 7060,
+    "deposit_amount_aud": 400,
+    "on_sale_aud": false,
+    "highlighted_deal_aud": false,
+    "highlighted_price_aud": true,
+    "price_cad": 7105,
+    "discount_price_cad": 5684,
+    "deposit_amount_cad": 400,
+    "on_sale_cad": true,
+    "highlighted_deal_cad": false,
+    "highlighted_price_cad": true,
+    "price_chf": 4175,
+    "discount_price_chf": 4175,
+    "deposit_amount_chf": 400,
+    "on_sale_chf": false,
+    "highlighted_deal_chf": false,
+    "highlighted_price_chf": true,
+    "price_eur": 4480,
+    "discount_price_eur": 4480,
+    "deposit_amount_eur": 400,
+    "on_sale_eur": false,
+    "highlighted_deal_eur": false,
+    "highlighted_price_eur": true,
+    "price_gbp": 3850,
+    "discount_price_gbp": 3850,
+    "deposit_amount_gbp": 200,
+    "on_sale_gbp": false,
+    "highlighted_deal_gbp": false,
+    "highlighted_price_gbp": true,
+    "price_nzd": 8355,
+    "discount_price_nzd": 8355,
+    "deposit_amount_nzd": 400,
+    "on_sale_nzd": false,
+    "highlighted_deal_nzd": false,
+    "highlighted_price_nzd": true,
+    "price_usd": 6855,
+    "discount_price_usd": 5484,
+    "deposit_amount_usd": 400,
+    "on_sale_usd": true,
+    "highlighted_deal_usd": false,
+    "highlighted_price_usd": true,
+    "price_zar": 95710,
+    "discount_price_zar": 95710,
+    "deposit_amount_zar": 4000,
+    "on_sale_zar": false,
+    "highlighted_deal_zar": false,
+    "highlighted_price_zar": true
   },
   {
-    "id": "2681578",
-    "objectID": "2681578",
-    "name": "Galapagos Island Hopping",
-    "departureId": 2681578,
-    "productId": 166517,
-    "productCode": "GGTG",
-    "productUrl": "/ecuador/galapagos-island-hopping-166517",
-    "primaryCountry": "Ecuador",
-    "destinations": ["Ecuador"],
-    "marketingRegions": ["South America"],
-    "themes": ["Wildlife"],
-    "styles": ["Original"],
-    "locations": ["Isla San Cristobal", "Isla Floreana", "Isla Isabela", "Isla Santa Cruz"],
-    "startCity": "Isla San Cristobal",
-    "endCity": "Puerto Ayora",
+    "primaryCountry": "Japan",
+    "destinations": [
+      "Japan"
+    ],
+    "marketingRegions": [
+      "Asia"
+    ],
+    "themes": [
+      "Explorer"
+    ],
+    "styles": [
+      "Premium"
+    ],
+    "name": "Premium Highlights of Japan",
+    "locations": [
+      "Tokyo",
+      "Kyoto",
+      "Kamakura",
+      "Yudanaka",
+      "Kanazawa"
+    ],
+    "startCity": "Tokyo",
+    "endCity": "Kyoto",
     "regions": [],
-    "subdivisions": ["Galapagos Islands"],
-    "activities": ["Isla San Cristobal - Snorkeling in La Loberia", "San Cristobal - Excursion to Leon Dormido or Lobos Islands"],
-    "marketingRating": 78,
+    "subdivisions": [
+      "Tokyo",
+      "Nagano",
+      "Ishikawa",
+      "Kyoto"
+    ],
+    "activities": [
+      "Tokyo - Welcome dinner",
+      "Tokyo - Authentic Samurai Experience",
+      "Tokyo - Sensoji Temple",
+      "Tokyo - River Cruise",
+      "Tokyo - Kamakura Day Trip",
+      "Kamakura - Enoden Ride",
+      "Kamakura - Rickshaw Ride",
+      "Kamakura - Kotoku-In temple",
+      "Yudanaka - Snow Monkey Park",
+      "Yudanaka - Onsen Experience",
+      "Kanazawa - Kenrokuen Garden",
+      "Kanazawa - Samurai District Walking Tour",
+      "Kanazawa - Higashi Chaya District walking tour",
+      "Kanazawa - Market Visit and Sushi Making Experience",
+      "Kyoto - Arashiyama Walking Tour",
+      "Kyoto - Gion Night walk",
+      "Kyoto - Yuzon Dyeing Workshop",
+      "Kyoto - Fushimi Inari - Taisha",
+      "Kyoto -Tea Ceremony"
+    ],
+    "excludedSaleRegions": [],
+    "productCode": "CJPH",
+    "productId": 166787,
+    "marketingRating": 73,
     "hasPlacesLeft": true,
-    "startDate": 1785024000,
-    "endDate": 1785628800,
-    "duration": 8,
-    "physicalRating": 3,
     "closedForBooking": false,
+    "duration": 9,
+    "physicalRating": 2,
+    "promotions": [],
+    "subdivisionCountries": [
+      "Tokyo in Japan",
+      "Nagano in Japan",
+      "Ishikawa in Japan",
+      "Kyoto in Japan"
+    ],
+    "tags": [],
+    "map": {
+      "alt": "Map of Premium Highlights Of Japan including Japan",
+      "url": "/v3/assets/blt0de87ff52d9c34a8/blte6b6c155077638d9/64eff2a2a9c2c320799c5530/CJPH_2024.gif",
+      "title": "CJPH 2024 - Map",
+      "width": 1100,
+      "height": 735
+    },
+    "productUrl": "/japan/premium-highlights-japan-166787",
+    "reviewCount": 57,
+    "reviewRating": 4.58,
+    "productImages": [
+      {
+        "alt": "Group of Intrepid travellers and leader exploring Sensoji Temple in downtown Tokyo",
+        "url": "/v3/assets/blt0de87ff52d9c34a8/blt08d14203a892a8be/65a1c9c32d0de385928f961f/Intrepid_Travel-Japan-Tokyo-Sensoji-temple-exploring-7.jpg"
+      },
+      {
+        "alt": "Japan, Kamakura, The Great Buddha",
+        "url": "/v3/assets/blt0de87ff52d9c34a8/blte7284cd0ffc58013/64eff2b3501047c501f81357/CJSH_Japan_Kamakura_The_Great_Buddha.jpg"
+      },
+      {
+        "alt": "Japanese macaques relaxing in a hot spring",
+        "url": "/v3/assets/blt0de87ff52d9c34a8/blt8be21af43fbb4980/64eff2aedaa16c7be0a5233d/Intrepid-Travel-Intrepid-Travel-Japan_Nagano_Snow-monkeys_ss_131685626.jpg"
+      },
+      {
+        "alt": "Group of Intrepid travellers and leader walking through Fushimi Inari gates in Kyoto",
+        "url": "/v3/assets/blt0de87ff52d9c34a8/bltec1a6a686b755fbc/65a1c9c4a44e3eed020e8a65/Intrepid_Travel-Japan-Kyoto-Fushimi-Inari-shrine-group-exploring-10.jpg"
+      },
+      {
+        "alt": "Arashiyama Bamboo grove",
+        "url": "/v3/assets/blt0de87ff52d9c34a8/blt00a9795dc58adff9/64eff2ba10408a3df126b03e/Intrepid-DMC-japan_kyoto_arashiyama_bamboo-grove.jpg"
+      }
+    ],
+    "objectID": "2642216",
+    "departureId": 2642216,
+    "startDate": 1794614400,
+    "endDate": 1795305600,
+    "lowestPrice": {
+      "aud": {
+        "type": "twin",
+        "price": 7430,
+        "onSale": false,
+        "currencyCode": "AUD",
+        "depositAmount": 400,
+        "discountPrice": 7430,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      },
+      "cad": {
+        "type": "twin",
+        "price": 7480,
+        "onSale": true,
+        "currencyCode": "CAD",
+        "depositAmount": 400,
+        "discountPrice": 5984,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      },
+      "chf": {
+        "type": "twin",
+        "price": 4395,
+        "onSale": false,
+        "currencyCode": "CHF",
+        "depositAmount": 400,
+        "discountPrice": 4395,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      },
+      "eur": {
+        "type": "twin",
+        "price": 4715,
+        "onSale": false,
+        "currencyCode": "EUR",
+        "depositAmount": 400,
+        "discountPrice": 4715,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      },
+      "gbp": {
+        "type": "twin",
+        "price": 4050,
+        "onSale": false,
+        "currencyCode": "GBP",
+        "depositAmount": 200,
+        "discountPrice": 4050,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      },
+      "nzd": {
+        "type": "twin",
+        "price": 8795,
+        "onSale": false,
+        "currencyCode": "NZD",
+        "depositAmount": 400,
+        "discountPrice": 8795,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      },
+      "usd": {
+        "type": "twin",
+        "price": 7185,
+        "onSale": true,
+        "currencyCode": "USD",
+        "depositAmount": 400,
+        "discountPrice": 5748,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      },
+      "zar": {
+        "type": "twin",
+        "price": 100745,
+        "onSale": false,
+        "currencyCode": "ZAR",
+        "depositAmount": 4000,
+        "discountPrice": 100745,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      }
+    },
+    "placesLeft": 10,
+    "id": "2642216",
+    "geoloc": [
+      [
+        35.6814,
+        139.7645
+      ],
+      [
+        35.0116363,
+        135.7680294
+      ],
+      [
+        35.3192128,
+        139.5466731
+      ],
+      [
+        36.7416383,
+        138.4147279
+      ],
+      [
+        36.5613254,
+        136.6562051
+      ]
+    ],
+    "mapUrl": "/v3/assets/blt0de87ff52d9c34a8/blte6b6c155077638d9/64eff2a2a9c2c320799c5530/CJPH_2024.gif",
+    "mapAlt": "Map of Premium Highlights Of Japan including Japan",
+    "mapTitle": "CJPH 2024 - Map",
+    "productImageUrls": [
+      "/v3/assets/blt0de87ff52d9c34a8/blt08d14203a892a8be/65a1c9c32d0de385928f961f/Intrepid_Travel-Japan-Tokyo-Sensoji-temple-exploring-7.jpg",
+      "/v3/assets/blt0de87ff52d9c34a8/blte7284cd0ffc58013/64eff2b3501047c501f81357/CJSH_Japan_Kamakura_The_Great_Buddha.jpg",
+      "/v3/assets/blt0de87ff52d9c34a8/blt8be21af43fbb4980/64eff2aedaa16c7be0a5233d/Intrepid-Travel-Intrepid-Travel-Japan_Nagano_Snow-monkeys_ss_131685626.jpg",
+      "/v3/assets/blt0de87ff52d9c34a8/bltec1a6a686b755fbc/65a1c9c4a44e3eed020e8a65/Intrepid_Travel-Japan-Kyoto-Fushimi-Inari-shrine-group-exploring-10.jpg",
+      "/v3/assets/blt0de87ff52d9c34a8/blt00a9795dc58adff9/64eff2ba10408a3df126b03e/Intrepid-DMC-japan_kyoto_arashiyama_bamboo-grove.jpg"
+    ],
+    "productImageAlts": [
+      "Group of Intrepid travellers and leader exploring Sensoji Temple in downtown Tokyo",
+      "Japan, Kamakura, The Great Buddha",
+      "Japanese macaques relaxing in a hot spring",
+      "Group of Intrepid travellers and leader walking through Fushimi Inari gates in Kyoto",
+      "Arashiyama Bamboo grove"
+    ],
+    "heroImageUrl": "/v3/assets/blt0de87ff52d9c34a8/blt08d14203a892a8be/65a1c9c32d0de385928f961f/Intrepid_Travel-Japan-Tokyo-Sensoji-temple-exploring-7.jpg",
+    "heroImageAlt": "Group of Intrepid travellers and leader exploring Sensoji Temple in downtown Tokyo",
+    "price_aud": 7430,
+    "discount_price_aud": 7430,
+    "deposit_amount_aud": 400,
+    "on_sale_aud": false,
+    "highlighted_deal_aud": false,
+    "highlighted_price_aud": false,
+    "price_cad": 7480,
+    "discount_price_cad": 5984,
+    "deposit_amount_cad": 400,
+    "on_sale_cad": true,
+    "highlighted_deal_cad": false,
+    "highlighted_price_cad": false,
+    "price_chf": 4395,
+    "discount_price_chf": 4395,
+    "deposit_amount_chf": 400,
+    "on_sale_chf": false,
+    "highlighted_deal_chf": false,
+    "highlighted_price_chf": false,
+    "price_eur": 4715,
+    "discount_price_eur": 4715,
+    "deposit_amount_eur": 400,
+    "on_sale_eur": false,
+    "highlighted_deal_eur": false,
+    "highlighted_price_eur": false,
+    "price_gbp": 4050,
+    "discount_price_gbp": 4050,
+    "deposit_amount_gbp": 200,
+    "on_sale_gbp": false,
+    "highlighted_deal_gbp": false,
+    "highlighted_price_gbp": false,
+    "price_nzd": 8795,
+    "discount_price_nzd": 8795,
+    "deposit_amount_nzd": 400,
+    "on_sale_nzd": false,
+    "highlighted_deal_nzd": false,
+    "highlighted_price_nzd": false,
+    "price_usd": 7185,
+    "discount_price_usd": 5748,
+    "deposit_amount_usd": 400,
+    "on_sale_usd": true,
+    "highlighted_deal_usd": false,
+    "highlighted_price_usd": false,
+    "price_zar": 100745,
+    "discount_price_zar": 100745,
+    "deposit_amount_zar": 4000,
+    "on_sale_zar": false,
+    "highlighted_deal_zar": false,
+    "highlighted_price_zar": false
+  },
+  {
+    "name": "Classic Cambodia & Vietnam",
+    "productCode": "TKKHC",
+    "productId": 168221,
+    "productUrl": "/vietnam/classic-cambodia-vietnam-168221",
+    "primaryCountry": "Vietnam",
+    "destinations": [
+      "Vietnam",
+      "Cambodia"
+    ],
+    "marketingRegions": [
+      "Asia"
+    ],
+    "themes": [
+      "Explorer"
+    ],
+    "styles": [
+      "Comfort"
+    ],
+    "locations": [
+      "Phnom Penh",
+      "Hanoi",
+      "Killing Fields of Choeung Ek",
+      "Siem Reap",
+      "Siemreap/Cambodia",
+      "Kampong Phluck",
+      "Ho Chi Minh City",
+      "Mekong Delta",
+      "Hoi An",
+      "Hue",
+      "Ninh Binh",
+      "Halong Bay"
+    ],
+    "startCity": "Phnom Penh",
+    "endCity": "Hanoi",
+    "regions": [
+      "Indochina",
+      "South East Asia"
+    ],
+    "subdivisions": [
+      "Phnom Penh",
+      "Siem Reab",
+      "Ho Chi Minh",
+      "Ben Tre",
+      "Quang Nam",
+      "Thua Thien-Hue",
+      "Ha Noi",
+      "Ninh Binh"
+    ],
+    "activities": [
+      "Complimentary Arrival Transfer",
+      "Phnom Penh - Tuol Sleng Genocide Museum (S21)",
+      "Phnom Penh - The Killing Fields of Choeung Ek",
+      "Phnom Penh - Royal Palace & Silver Pagoda",
+      "Siem Reap - Leader-led orientation walk",
+      "Kampong Thom - Santuk Silkfarm visit",
+      "Kampong Thom - Lunch prepared by women weavers at the silkfarm",
+      "Siem Reap - Angkor Temples Guided Tour",
+      "Siem Reap - Monk Blessing",
+      "Siem Reap - One day Angkor Pass",
+      "Siem Reap - Lunch at the Spoons",
+      "Kampong Phluck - Visit to kampong Phluck lakeside village",
+      "Siem Reap - Countryside village walk & sunset drink",
+      "Siem Reap - Farewell Dinner",
+      "Ho Chi Minh City - Welcome Dinner",
+      "Ho Chi Minh City - War Remnants Museum",
+      "Ho Chi Minh City - Cu Chi Tunnels",
+      "Mekong Delta - Boat cruise with visits to local producers",
+      "Mekong Delta - Home-cooked lunch",
+      "Hoi An - Old Town walking tour",
+      "Hue - Imperial City entrance and guided visit",
+      "Hue - Royal tomb of Emperor Tu Duc",
+      "Hue - Thien Mu Pagoda",
+      "Hue - Vegetarian lunch at a Buddhist nunnery",
+      "Hanoi - KOTO lunch",
+      "Hanoi - One Pillar Pagoda & HCM stilt house",
+      "Hanoi - Temple of Literature",
+      "Ninh Binh - Hoa Lu",
+      "Ninh Binh - Home Cooked Lunch",
+      "Cuc Phuong NP - Save Vietnam's Wildlife (The Intrepid Foundation partner) visit",
+      "Ninh Binh - Thung Nham Ecotourism Zone",
+      "Halong Bay - Overnight Boat Cruise",
+      "Hanoi - Old Quarter Tour",
+      "Hanoi - Local water puppet performance"
+    ],
+    "excludedSaleRegions": [],
+    "tags": [],
+    "closedForBooking": false,
+    "duration": 20,
+    "physicalRating": 2,
+    "promotions": [],
+    "subdivisionCountries": [
+      "Phnom Penh in Cambodia",
+      "Siem Reab in Cambodia",
+      "Ho Chi Minh in Vietnam",
+      "Ben Tre in Vietnam",
+      "Quang Nam in Vietnam",
+      "Thua Thien-Hue in Vietnam",
+      "Ha Noi in Vietnam",
+      "Ninh Binh in Vietnam"
+    ],
+    "map": {
+      "alt": "Map of Classic Cambodia & Vietnam including Cambodia and Vietnam",
+      "url": "/v3/assets/blt0de87ff52d9c34a8/blte2343725a392e7ad/69475c904b200dc01cbf0816/TKKHC_2025.gif",
+      "title": "TKKHC_2025 - Map",
+      "width": 1100,
+      "height": 735
+    },
     "placesLeft": 12,
-    "reviewCount": 331,
-    "reviewRating": 4.96
+    "reviewCount": 31,
+    "reviewRating": 4.87,
+    "hasPlacesLeft": true,
+    "productImages": [
+      {
+        "alt": "cambodia ankor wat sunrise",
+        "url": "/v3/assets/blt0de87ff52d9c34a8/blt36d48490328c9e36/63c8c9b2acb29e11df7ff1ff/05_TKKS_Cambodia_Angkor-Wat.jpg"
+      },
+      {
+        "alt": "vietnam mekong ho chi minh city traveller river boat",
+        "url": "/v3/assets/blt0de87ff52d9c34a8/blt8ee9412cb4c9774d/63c8ce712ad4a97d0ed00b72/Intrepid_Travel-vietnam_mekong_ho-chi-minh-city_traveller-river-boat-4000_(1).jpg"
+      },
+      {
+        "alt": "Cambodia Phnom Penh Market",
+        "url": "/v3/assets/blt0de87ff52d9c34a8/blt725ac1ebb54d147c/63c8c9a5d098ce34dc304dd4/02_TKKS_Cambodia_Phnom-Penh_Market.jpg"
+      },
+      {
+        "alt": "Vietnam hoi an leader street",
+        "url": "/v3/assets/blt0de87ff52d9c34a8/blt95c2d953982bf408/63c8ce7bd4b54d649fb35a24/Intrepid_Travel-Vietnam-hoi-an-leader-street-4485.jpg"
+      },
+      {
+        "alt": "Vietnam halong bay leader",
+        "url": "/v3/assets/blt0de87ff52d9c34a8/blt59a3fc117eebf258/63c8ce8d68e9670e8f3e4936/Intrepid_Travel-Vietnam-halong-bay-leader-3925.jpg"
+      }
+    ],
+    "marketingRating": 70,
+    "objectID": "2804503",
+    "departureId": 2804503,
+    "startDate": 1821225600,
+    "endDate": 1822867200,
+    "lowestPrice": {
+      "aud": {
+        "type": "twin",
+        "price": 5755,
+        "onSale": false,
+        "currencyCode": "AUD",
+        "depositAmount": 400,
+        "discountPrice": 5755,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      },
+      "cad": {
+        "type": "twin",
+        "price": 5110,
+        "onSale": false,
+        "currencyCode": "CAD",
+        "depositAmount": 400,
+        "discountPrice": 5110,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      },
+      "chf": {
+        "type": "twin",
+        "price": 3065,
+        "onSale": false,
+        "currencyCode": "CHF",
+        "depositAmount": 400,
+        "discountPrice": 3065,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      },
+      "eur": {
+        "type": "twin",
+        "price": 3285,
+        "onSale": false,
+        "currencyCode": "EUR",
+        "depositAmount": 400,
+        "discountPrice": 3285,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      },
+      "gbp": {
+        "type": "twin",
+        "price": 2800,
+        "onSale": false,
+        "currencyCode": "GBP",
+        "depositAmount": 200,
+        "discountPrice": 2800,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      },
+      "nzd": {
+        "type": "twin",
+        "price": 6145,
+        "onSale": false,
+        "currencyCode": "NZD",
+        "depositAmount": 400,
+        "discountPrice": 6145,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      },
+      "usd": {
+        "type": "twin",
+        "price": 4350,
+        "onSale": false,
+        "currencyCode": "USD",
+        "depositAmount": 400,
+        "discountPrice": 4350,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      },
+      "zar": {
+        "type": "twin",
+        "price": 68800,
+        "onSale": false,
+        "currencyCode": "ZAR",
+        "depositAmount": 4000,
+        "discountPrice": 68800,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      }
+    },
+    "id": "2804503",
+    "geoloc": [
+      [
+        11.55876,
+        104.91771
+      ],
+      [
+        21.0277644,
+        105.8341598
+      ],
+      [
+        11.4843,
+        104.9018
+      ],
+      [
+        13.36866,
+        103.864403
+      ],
+      [
+        13.3670968,
+        103.8448134
+      ],
+      [
+        10.8230989,
+        106.6296638
+      ],
+      [
+        10.284,
+        106.142
+      ],
+      [
+        15.88007,
+        108.33805
+      ],
+      [
+        16.463461,
+        107.584702
+      ],
+      [
+        20.253275,
+        105.97578
+      ],
+      [
+        20.9100512,
+        107.1839024
+      ]
+    ],
+    "mapUrl": "/v3/assets/blt0de87ff52d9c34a8/blte2343725a392e7ad/69475c904b200dc01cbf0816/TKKHC_2025.gif",
+    "mapAlt": "Map of Classic Cambodia & Vietnam including Cambodia and Vietnam",
+    "mapTitle": "TKKHC_2025 - Map",
+    "productImageUrls": [
+      "/v3/assets/blt0de87ff52d9c34a8/blt36d48490328c9e36/63c8c9b2acb29e11df7ff1ff/05_TKKS_Cambodia_Angkor-Wat.jpg",
+      "/v3/assets/blt0de87ff52d9c34a8/blt8ee9412cb4c9774d/63c8ce712ad4a97d0ed00b72/Intrepid_Travel-vietnam_mekong_ho-chi-minh-city_traveller-river-boat-4000_(1).jpg",
+      "/v3/assets/blt0de87ff52d9c34a8/blt725ac1ebb54d147c/63c8c9a5d098ce34dc304dd4/02_TKKS_Cambodia_Phnom-Penh_Market.jpg",
+      "/v3/assets/blt0de87ff52d9c34a8/blt95c2d953982bf408/63c8ce7bd4b54d649fb35a24/Intrepid_Travel-Vietnam-hoi-an-leader-street-4485.jpg",
+      "/v3/assets/blt0de87ff52d9c34a8/blt59a3fc117eebf258/63c8ce8d68e9670e8f3e4936/Intrepid_Travel-Vietnam-halong-bay-leader-3925.jpg"
+    ],
+    "productImageAlts": [
+      "cambodia ankor wat sunrise",
+      "vietnam mekong ho chi minh city traveller river boat",
+      "Cambodia Phnom Penh Market",
+      "Vietnam hoi an leader street",
+      "Vietnam halong bay leader"
+    ],
+    "heroImageUrl": "/v3/assets/blt0de87ff52d9c34a8/blt36d48490328c9e36/63c8c9b2acb29e11df7ff1ff/05_TKKS_Cambodia_Angkor-Wat.jpg",
+    "heroImageAlt": "cambodia ankor wat sunrise",
+    "price_aud": 5755,
+    "discount_price_aud": 5755,
+    "deposit_amount_aud": 400,
+    "on_sale_aud": false,
+    "highlighted_deal_aud": false,
+    "highlighted_price_aud": false,
+    "price_cad": 5110,
+    "discount_price_cad": 5110,
+    "deposit_amount_cad": 400,
+    "on_sale_cad": false,
+    "highlighted_deal_cad": false,
+    "highlighted_price_cad": false,
+    "price_chf": 3065,
+    "discount_price_chf": 3065,
+    "deposit_amount_chf": 400,
+    "on_sale_chf": false,
+    "highlighted_deal_chf": false,
+    "highlighted_price_chf": false,
+    "price_eur": 3285,
+    "discount_price_eur": 3285,
+    "deposit_amount_eur": 400,
+    "on_sale_eur": false,
+    "highlighted_deal_eur": false,
+    "highlighted_price_eur": false,
+    "price_gbp": 2800,
+    "discount_price_gbp": 2800,
+    "deposit_amount_gbp": 200,
+    "on_sale_gbp": false,
+    "highlighted_deal_gbp": false,
+    "highlighted_price_gbp": false,
+    "price_nzd": 6145,
+    "discount_price_nzd": 6145,
+    "deposit_amount_nzd": 400,
+    "on_sale_nzd": false,
+    "highlighted_deal_nzd": false,
+    "highlighted_price_nzd": false,
+    "price_usd": 4350,
+    "discount_price_usd": 4350,
+    "deposit_amount_usd": 400,
+    "on_sale_usd": false,
+    "highlighted_deal_usd": false,
+    "highlighted_price_usd": false,
+    "price_zar": 68800,
+    "discount_price_zar": 68800,
+    "deposit_amount_zar": 4000,
+    "on_sale_zar": false,
+    "highlighted_deal_zar": false,
+    "highlighted_price_zar": false
+  },
+  {
+    "name": "Classic Cambodia & Vietnam",
+    "productCode": "TKKHC",
+    "productId": 168221,
+    "productUrl": "/vietnam/classic-cambodia-vietnam-168221",
+    "primaryCountry": "Vietnam",
+    "destinations": [
+      "Vietnam",
+      "Cambodia"
+    ],
+    "marketingRegions": [
+      "Asia"
+    ],
+    "themes": [
+      "Explorer"
+    ],
+    "styles": [
+      "Comfort"
+    ],
+    "locations": [
+      "Phnom Penh",
+      "Hanoi",
+      "Killing Fields of Choeung Ek",
+      "Siem Reap",
+      "Siemreap/Cambodia",
+      "Kampong Phluck",
+      "Ho Chi Minh City",
+      "Mekong Delta",
+      "Hoi An",
+      "Hue",
+      "Ninh Binh",
+      "Halong Bay"
+    ],
+    "startCity": "Phnom Penh",
+    "endCity": "Hanoi",
+    "regions": [
+      "Indochina",
+      "South East Asia"
+    ],
+    "subdivisions": [
+      "Phnom Penh",
+      "Siem Reab",
+      "Ho Chi Minh",
+      "Ben Tre",
+      "Quang Nam",
+      "Thua Thien-Hue",
+      "Ha Noi",
+      "Ninh Binh"
+    ],
+    "activities": [
+      "Complimentary Arrival Transfer",
+      "Phnom Penh - Tuol Sleng Genocide Museum (S21)",
+      "Phnom Penh - The Killing Fields of Choeung Ek",
+      "Phnom Penh - Royal Palace & Silver Pagoda",
+      "Siem Reap - Leader-led orientation walk",
+      "Kampong Thom - Santuk Silkfarm visit",
+      "Kampong Thom - Lunch prepared by women weavers at the silkfarm",
+      "Siem Reap - Angkor Temples Guided Tour",
+      "Siem Reap - Monk Blessing",
+      "Siem Reap - One day Angkor Pass",
+      "Siem Reap - Lunch at the Spoons",
+      "Kampong Phluck - Visit to kampong Phluck lakeside village",
+      "Siem Reap - Countryside village walk & sunset drink",
+      "Siem Reap - Farewell Dinner",
+      "Ho Chi Minh City - Welcome Dinner",
+      "Ho Chi Minh City - War Remnants Museum",
+      "Ho Chi Minh City - Cu Chi Tunnels",
+      "Mekong Delta - Boat cruise with visits to local producers",
+      "Mekong Delta - Home-cooked lunch",
+      "Hoi An - Old Town walking tour",
+      "Hue - Imperial City entrance and guided visit",
+      "Hue - Royal tomb of Emperor Tu Duc",
+      "Hue - Thien Mu Pagoda",
+      "Hue - Vegetarian lunch at a Buddhist nunnery",
+      "Hanoi - KOTO lunch",
+      "Hanoi - One Pillar Pagoda & HCM stilt house",
+      "Hanoi - Temple of Literature",
+      "Ninh Binh - Hoa Lu",
+      "Ninh Binh - Home Cooked Lunch",
+      "Cuc Phuong NP - Save Vietnam's Wildlife (The Intrepid Foundation partner) visit",
+      "Ninh Binh - Thung Nham Ecotourism Zone",
+      "Halong Bay - Overnight Boat Cruise",
+      "Hanoi - Old Quarter Tour",
+      "Hanoi - Local water puppet performance"
+    ],
+    "excludedSaleRegions": [],
+    "tags": [],
+    "closedForBooking": false,
+    "duration": 20,
+    "physicalRating": 2,
+    "promotions": [],
+    "subdivisionCountries": [
+      "Phnom Penh in Cambodia",
+      "Siem Reab in Cambodia",
+      "Ho Chi Minh in Vietnam",
+      "Ben Tre in Vietnam",
+      "Quang Nam in Vietnam",
+      "Thua Thien-Hue in Vietnam",
+      "Ha Noi in Vietnam",
+      "Ninh Binh in Vietnam"
+    ],
+    "map": {
+      "alt": "Map of Classic Cambodia & Vietnam including Cambodia and Vietnam",
+      "url": "/v3/assets/blt0de87ff52d9c34a8/blte2343725a392e7ad/69475c904b200dc01cbf0816/TKKHC_2025.gif",
+      "title": "TKKHC_2025 - Map",
+      "width": 1100,
+      "height": 735
+    },
+    "placesLeft": 12,
+    "reviewCount": 31,
+    "reviewRating": 4.87,
+    "hasPlacesLeft": true,
+    "productImages": [
+      {
+        "alt": "cambodia ankor wat sunrise",
+        "url": "/v3/assets/blt0de87ff52d9c34a8/blt36d48490328c9e36/63c8c9b2acb29e11df7ff1ff/05_TKKS_Cambodia_Angkor-Wat.jpg"
+      },
+      {
+        "alt": "vietnam mekong ho chi minh city traveller river boat",
+        "url": "/v3/assets/blt0de87ff52d9c34a8/blt8ee9412cb4c9774d/63c8ce712ad4a97d0ed00b72/Intrepid_Travel-vietnam_mekong_ho-chi-minh-city_traveller-river-boat-4000_(1).jpg"
+      },
+      {
+        "alt": "Cambodia Phnom Penh Market",
+        "url": "/v3/assets/blt0de87ff52d9c34a8/blt725ac1ebb54d147c/63c8c9a5d098ce34dc304dd4/02_TKKS_Cambodia_Phnom-Penh_Market.jpg"
+      },
+      {
+        "alt": "Vietnam hoi an leader street",
+        "url": "/v3/assets/blt0de87ff52d9c34a8/blt95c2d953982bf408/63c8ce7bd4b54d649fb35a24/Intrepid_Travel-Vietnam-hoi-an-leader-street-4485.jpg"
+      },
+      {
+        "alt": "Vietnam halong bay leader",
+        "url": "/v3/assets/blt0de87ff52d9c34a8/blt59a3fc117eebf258/63c8ce8d68e9670e8f3e4936/Intrepid_Travel-Vietnam-halong-bay-leader-3925.jpg"
+      }
+    ],
+    "marketingRating": 70,
+    "objectID": "2759176",
+    "departureId": 2759176,
+    "startDate": 1829865600,
+    "endDate": 1831507200,
+    "lowestPrice": {
+      "aud": {
+        "type": "twin",
+        "price": 6405,
+        "onSale": false,
+        "currencyCode": "AUD",
+        "depositAmount": 400,
+        "discountPrice": 6405,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      },
+      "cad": {
+        "type": "twin",
+        "price": 5685,
+        "onSale": false,
+        "currencyCode": "CAD",
+        "depositAmount": 400,
+        "discountPrice": 5685,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      },
+      "chf": {
+        "type": "twin",
+        "price": 3410,
+        "onSale": false,
+        "currencyCode": "CHF",
+        "depositAmount": 400,
+        "discountPrice": 3410,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      },
+      "eur": {
+        "type": "twin",
+        "price": 3655,
+        "onSale": false,
+        "currencyCode": "EUR",
+        "depositAmount": 400,
+        "discountPrice": 3655,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      },
+      "gbp": {
+        "type": "twin",
+        "price": 3120,
+        "onSale": false,
+        "currencyCode": "GBP",
+        "depositAmount": 200,
+        "discountPrice": 3120,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      },
+      "nzd": {
+        "type": "twin",
+        "price": 6895,
+        "onSale": false,
+        "currencyCode": "NZD",
+        "depositAmount": 400,
+        "discountPrice": 6895,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      },
+      "usd": {
+        "type": "twin",
+        "price": 5300,
+        "onSale": false,
+        "currencyCode": "USD",
+        "depositAmount": 400,
+        "discountPrice": 5300,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      },
+      "zar": {
+        "type": "twin",
+        "price": 76575,
+        "onSale": false,
+        "currencyCode": "ZAR",
+        "depositAmount": 4000,
+        "discountPrice": 76575,
+        "isHighlightedDeal": false,
+        "isHighlightedPrice": false
+      }
+    },
+    "id": "2759176",
+    "geoloc": [
+      [
+        11.55876,
+        104.91771
+      ],
+      [
+        21.0277644,
+        105.8341598
+      ],
+      [
+        11.4843,
+        104.9018
+      ],
+      [
+        13.36866,
+        103.864403
+      ],
+      [
+        13.3670968,
+        103.8448134
+      ],
+      [
+        10.8230989,
+        106.6296638
+      ],
+      [
+        10.284,
+        106.142
+      ],
+      [
+        15.88007,
+        108.33805
+      ],
+      [
+        16.463461,
+        107.584702
+      ],
+      [
+        20.253275,
+        105.97578
+      ],
+      [
+        20.9100512,
+        107.1839024
+      ]
+    ],
+    "mapUrl": "/v3/assets/blt0de87ff52d9c34a8/blte2343725a392e7ad/69475c904b200dc01cbf0816/TKKHC_2025.gif",
+    "mapAlt": "Map of Classic Cambodia & Vietnam including Cambodia and Vietnam",
+    "mapTitle": "TKKHC_2025 - Map",
+    "productImageUrls": [
+      "/v3/assets/blt0de87ff52d9c34a8/blt36d48490328c9e36/63c8c9b2acb29e11df7ff1ff/05_TKKS_Cambodia_Angkor-Wat.jpg",
+      "/v3/assets/blt0de87ff52d9c34a8/blt8ee9412cb4c9774d/63c8ce712ad4a97d0ed00b72/Intrepid_Travel-vietnam_mekong_ho-chi-minh-city_traveller-river-boat-4000_(1).jpg",
+      "/v3/assets/blt0de87ff52d9c34a8/blt725ac1ebb54d147c/63c8c9a5d098ce34dc304dd4/02_TKKS_Cambodia_Phnom-Penh_Market.jpg",
+      "/v3/assets/blt0de87ff52d9c34a8/blt95c2d953982bf408/63c8ce7bd4b54d649fb35a24/Intrepid_Travel-Vietnam-hoi-an-leader-street-4485.jpg",
+      "/v3/assets/blt0de87ff52d9c34a8/blt59a3fc117eebf258/63c8ce8d68e9670e8f3e4936/Intrepid_Travel-Vietnam-halong-bay-leader-3925.jpg"
+    ],
+    "productImageAlts": [
+      "cambodia ankor wat sunrise",
+      "vietnam mekong ho chi minh city traveller river boat",
+      "Cambodia Phnom Penh Market",
+      "Vietnam hoi an leader street",
+      "Vietnam halong bay leader"
+    ],
+    "heroImageUrl": "/v3/assets/blt0de87ff52d9c34a8/blt36d48490328c9e36/63c8c9b2acb29e11df7ff1ff/05_TKKS_Cambodia_Angkor-Wat.jpg",
+    "heroImageAlt": "cambodia ankor wat sunrise",
+    "price_aud": 6405,
+    "discount_price_aud": 6405,
+    "deposit_amount_aud": 400,
+    "on_sale_aud": false,
+    "highlighted_deal_aud": false,
+    "highlighted_price_aud": false,
+    "price_cad": 5685,
+    "discount_price_cad": 5685,
+    "deposit_amount_cad": 400,
+    "on_sale_cad": false,
+    "highlighted_deal_cad": false,
+    "highlighted_price_cad": false,
+    "price_chf": 3410,
+    "discount_price_chf": 3410,
+    "deposit_amount_chf": 400,
+    "on_sale_chf": false,
+    "highlighted_deal_chf": false,
+    "highlighted_price_chf": false,
+    "price_eur": 3655,
+    "discount_price_eur": 3655,
+    "deposit_amount_eur": 400,
+    "on_sale_eur": false,
+    "highlighted_deal_eur": false,
+    "highlighted_price_eur": false,
+    "price_gbp": 3120,
+    "discount_price_gbp": 3120,
+    "deposit_amount_gbp": 200,
+    "on_sale_gbp": false,
+    "highlighted_deal_gbp": false,
+    "highlighted_price_gbp": false,
+    "price_nzd": 6895,
+    "discount_price_nzd": 6895,
+    "deposit_amount_nzd": 400,
+    "on_sale_nzd": false,
+    "highlighted_deal_nzd": false,
+    "highlighted_price_nzd": false,
+    "price_usd": 5300,
+    "discount_price_usd": 5300,
+    "deposit_amount_usd": 400,
+    "on_sale_usd": false,
+    "highlighted_deal_usd": false,
+    "highlighted_price_usd": false,
+    "price_zar": 76575,
+    "discount_price_zar": 76575,
+    "deposit_amount_zar": 4000,
+    "on_sale_zar": false,
+    "highlighted_deal_zar": false,
+    "highlighted_price_zar": false
   }
 ]

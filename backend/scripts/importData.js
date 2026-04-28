@@ -10,14 +10,14 @@ const schema = JSON.parse(fs.readFileSync(schemaPath, "utf8"));
 
 async function ensureCollectionExists() {
   try {
-    await client.collections("departures").retrieve();
+    await client.collections("travel_departures").retrieve();
   } catch (error) {
     if (error?.httpStatus !== 404) {
       throw error;
     }
 
     await client.collections().create(schema);
-    console.log("Collection created: departures");
+    console.log("Collection created: travel_departures");
   }
 }
 
@@ -26,7 +26,7 @@ async function importData() {
     await ensureCollectionExists();
 
     const res = await client
-      .collections("departures")
+      .collections("travel_departures")
       .documents()
       .import(data, { action: "upsert" });
 
