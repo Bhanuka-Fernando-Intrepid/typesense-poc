@@ -2,8 +2,14 @@
   "name": "departures",
   "fields": [
     { "name": "id", "type": "string" },
+    { "name": "objectID", "type": "string" },
 
     { "name": "name", "type": "string" },
+    { "name": "departureId", "type": "int64" },
+    { "name": "productId", "type": "int64" },
+    { "name": "productCode", "type": "string", "facet": true },
+    { "name": "productUrl", "type": "string" },
+
     { "name": "primaryCountry", "type": "string", "facet": true },
 
     { "name": "destinations", "type": "string[]", "facet": true },
@@ -12,15 +18,21 @@
     { "name": "styles", "type": "string[]", "facet": true },
     { "name": "locations", "type": "string[]" },
     { "name": "regions", "type": "string[]", "facet": true },
+    { "name": "subdivisions", "type": "string[]", "facet": true },
+    { "name": "activities", "type": "string[]" },
 
-    { "name": "duration", "type": "int32" },
-    { "name": "physicalRating", "type": "int32" },
+    { "name": "startCity", "type": "string", "facet": true },
+    { "name": "endCity", "type": "string", "facet": true },
+
+    { "name": "duration", "type": "int32", "facet": true },
+    { "name": "physicalRating", "type": "int32", "facet": true },
 
     { "name": "marketingRating", "type": "int32" },
     { "name": "reviewRating", "type": "float" },
     { "name": "reviewCount", "type": "int32" },
 
     { "name": "hasPlacesLeft", "type": "bool", "facet": true },
+    { "name": "closedForBooking", "type": "bool", "facet": true },
     { "name": "placesLeft", "type": "int32" },
 
     { "name": "startDate", "type": "int64" },
