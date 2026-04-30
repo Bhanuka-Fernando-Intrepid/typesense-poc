@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, useRef } from 'react'
 import { Link, Route, Routes, useParams } from 'react-router-dom'
 import Typesense from 'typesense'
 import './App.css'
@@ -254,6 +254,9 @@ function FilterOption({ label, count, active, onClick }) {
 
 function ProductSearchPage({ selectedCurrency }) {
   const [query, setQuery] = useState('')
+  const [suggestions, setSuggestions] = useState([])
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const searchContainerRef = useRef(null)
   const [sortBy, setSortBy] = useState(SORT_OPTIONS[0].value)
   const [filters, setFilters] = useState(DEFAULT_FILTERS)
   const [products, setProducts] = useState([])
@@ -380,7 +383,7 @@ function ProductSearchPage({ selectedCurrency }) {
 
     const timer = window.setTimeout(() => {
       runSearch()
-    }, 200)
+    }, 300)
 
     return () => {
       isActive = false
@@ -388,11 +391,118 @@ function ProductSearchPage({ selectedCurrency }) {
     }
   }, [query, adjustedSortBy, filters, selectedCurrency])
 
+  // Suggestions fetching (debounced shorter than main search)
+  useEffect(() => {
+    if (!query || !TYPESENSE_READY) {
+      setSuggestions([])
+      return
+    }
+
+    let isActive = true
+    const fetchSuggestions = async () => {
+      try {
+        const params = {
+          q: query.trim(),
+          query_by: 'name,primaryCountry,destinations,locations,marketingRegions,themes,styles',
+          per_page: 8,
+          include_fields: 'name,primaryCountry,destinations,locations',
+          prefix: true,
+        }
+
+        const res = await client.collections(TYPESENSE_COLLECTION).documents().search(params)
+        if (!isActive) return
+
+        const hits = Array.isArray(res.hits) ? res.hits.map((h) => h.document) : []
+        const qLower = query.trim().toLowerCase()
+        const items = []
+        const seen = new Set()
+
+        const pushIf = (str) => {
+          if (!str) return
+          const s = String(str).trim()
+          const key = s.toLowerCase()
+          if (!key || seen.has(key)) return
+          // only include if query appears in value (helps relevance)
+          if (qLower && key.indexOf(qLower) === -1) return
+          seen.add(key)
+          items.push(s)
+        }
+
+        for (const doc of hits) {
+          // primaryCountry
+          pushIf(doc.primaryCountry)
+
+          // destinations array
+          if (Array.isArray(doc.destinations)) {
+            for (const d of doc.destinations) pushIf(d)
+          }
+
+          // locations array
+          if (Array.isArray(doc.locations)) {
+            for (const l of doc.locations) pushIf(l)
+          }
+
+          // trip name
+          pushIf(doc.name)
+
+          if (items.length >= 5) break
+        }
+
+        setSuggestions(items.slice(0, 5))
+        setShowSuggestions(true)
+      } catch (err) {
+        console.error('Suggestion fetch error', err)
+        setSuggestions([])
+        setShowSuggestions(false)
+      }
+    }
+
+    const t = window.setTimeout(() => fetchSuggestions(), 200)
+
+    return () => {
+      isActive = false
+      window.clearTimeout(t)
+    }
+  }, [query])
+
+  // Click outside to close suggestions
+  useEffect(() => {
+    const onDocClick = (e) => {
+      if (!searchContainerRef.current) return
+      if (!searchContainerRef.current.contains(e.target)) {
+        setShowSuggestions(false)
+      }
+    }
+    document.addEventListener('mousedown', onDocClick)
+    return () => document.removeEventListener('mousedown', onDocClick)
+  }, [])
+
   const clearFilters = () => {
     setFilters(DEFAULT_FILTERS)
   }
 
   const hasResults = products.length > 0
+
+  function renderHighlighted(text, q) {
+    if (!q) return text
+    const s = String(text)
+    const qTrim = q.trim()
+    if (!qTrim) return s
+    const sLower = s.toLowerCase()
+    const qLower = qTrim.toLowerCase()
+    const idx = sLower.indexOf(qLower)
+    if (idx === -1) return s
+    const before = s.slice(0, idx)
+    const match = s.slice(idx, idx + qTrim.length)
+    const after = s.slice(idx + qTrim.length)
+    return (
+      <>
+        {before}
+        <strong>{match}</strong>
+        {after}
+      </>
+    )
+  }
 
   return (
     <>
@@ -406,7 +516,7 @@ function ProductSearchPage({ selectedCurrency }) {
         <div className="search-count">
           <strong>{isLoading ? '...' : totalFound.toLocaleString()}</strong> trips found
         </div>
-        <div className="search-pill">
+        <div className="search-pill" ref={searchContainerRef}>
           <div className="search-input">
             <span className="search-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24">
@@ -420,14 +530,30 @@ function ProductSearchPage({ selectedCurrency }) {
               type="search"
               placeholder="Search destination, trip name, city, or style"
               value={query}
-              onChange={(event) => setQuery(event.target.value)}
+              onChange={(event) => {
+                setQuery(event.target.value)
+              }}
+              onFocus={() => { if (query) setShowSuggestions(true) }}
               aria-label="Search trips"
             />
+            {query ? (
+              <button
+                className="clear-query"
+                aria-label="Clear search"
+                onClick={() => {
+                  setQuery('')
+                  setSuggestions([])
+                  setShowSuggestions(false)
+                }}
+              >
+                ×
+              </button>
+            ) : null}
           </div>
 
           <div className="search-divider" aria-hidden="true" />
 
-          <div className="search-dates">
+          <div className="search-dates visual-only">
             <span className="calendar-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24">
                 <path
@@ -436,12 +562,10 @@ function ProductSearchPage({ selectedCurrency }) {
                 />
               </svg>
             </span>
-            <input type="text" placeholder="Start date" aria-label="Start date" />
-            <span aria-hidden="true">to</span>
-            <input type="text" placeholder="End date" aria-label="End date" />
+            <div className="start-date-label">Start date</div>
           </div>
 
-          <button type="button" className="search-button">
+          <button type="button" className="search-button" onClick={() => { /* visual-only, main search reacts to query */ }}>
             <span>Search</span>
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path
@@ -450,6 +574,31 @@ function ProductSearchPage({ selectedCurrency }) {
               />
             </svg>
           </button>
+
+          {showSuggestions && suggestions.length > 0 ? (
+            <div className="suggestions-dropdown" role="listbox">
+              <div className="suggestions-title">SUGGESTED SEARCHES</div>
+              <ul>
+                {suggestions.map((sug) => (
+                  <li
+                    key={sug}
+                    className="suggestion-item"
+                    role="option"
+                    onMouseDown={(e) => {
+                      // prevent blur before click
+                      e.preventDefault()
+                      setQuery(sug)
+                      setShowSuggestions(false)
+                    }}
+                    onClick={() => { /* click handled onMouseDown */ }}
+                  >
+                    <span className="suggestion-icon" aria-hidden="true">🔍</span>
+                    <span className="suggestion-text">{renderHighlighted(sug, query)}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
         </div>
       </section>
 
