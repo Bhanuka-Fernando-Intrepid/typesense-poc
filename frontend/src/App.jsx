@@ -6,7 +6,7 @@ import './App.css'
 const TYPESENSE_HOST = import.meta.env.VITE_TYPESENSE_HOST || "";
 const TYPESENSE_PORT = Number(import.meta.env.VITE_TYPESENSE_PORT) || 443;
 const TYPESENSE_PROTOCOL = import.meta.env.VITE_TYPESENSE_PROTOCOL || "https";
-const TYPESENSE_API_KEY = import.meta.env.VITE_TYPESENSE_API_KEY || "";
+const TYPESENSE_API_KEY = import.meta.env.VITE_TYPESENSE_SEARCH_API_KEY || import.meta.env.VITE_TYPESENSE_API_KEY || "";
 const TYPESENSE_COLLECTION = import.meta.env.VITE_TYPESENSE_COLLECTION || "dev_intrepid_departure";
 const TYPESENSE_READY = Boolean(TYPESENSE_HOST && TYPESENSE_API_KEY && TYPESENSE_COLLECTION);
 
@@ -52,26 +52,17 @@ const REGION_CONFIG = [
 ]
 
 const SORT_OPTIONS = [
-  {
-    label: 'Relevance',
-    value: '_text_match:desc',
-  },
-  {
-    label: 'Price (low to high)',
-    value: 'price_usd:asc',
-  },
-  {
-    label: 'Price (high to low)',
-    value: 'price_usd:desc',
-  },
-  {
-    label: 'Duration (short to long)',
-    value: 'duration:asc',
-  },
+  { label: 'Relevance', value: 'relevance' },
+  { label: 'Price (low to high)', value: 'price_asc' },
+  { label: 'Price (high to low)', value: 'price_desc' },
+  { label: 'Duration (short to long)', value: 'duration_asc' },
+  { label: 'Duration (long to short)', value: 'duration_desc' },
+  { label: 'Rating', value: 'rating_desc' },
+  { label: 'Soonest departure', value: 'startDate_asc' },
 ]
 
 const SEARCH_FIELDS =
-  'name,primaryCountry,destinations,marketingRegions,styles,locations,startCity,endCity,themes'
+  'name,primaryCountry,destinations,locations,marketingRegions,themes,styles'
 
 const FACET_FIELDS = 'marketingRegions,styles'
 
@@ -140,6 +131,7 @@ function getLowestPrice(lowestPrice, currencyCode = 'usd') {
 
   return {
     price: price,
+    originalPrice: priceData.price,
     currency: priceData.currencyCode || currencyCode.toUpperCase(),
     onSale: priceData.onSale ?? false,
   }
@@ -198,6 +190,12 @@ function buildFilterBy(selectedFilters, selectedCurrency) {
   if (selectedFilters.priceMin) clauses.push(`lowestPrice.${selectedCurrency}.price:>=${selectedFilters.priceMin}`)
   if (selectedFilters.priceMax) clauses.push(`lowestPrice.${selectedCurrency}.price:<=${selectedFilters.priceMax}`)
 
+  if (selectedFilters.startDate) {
+    // selectedFilters.startDate expected as yyyy-mm-dd from the date input; convert to epoch seconds used in index
+    const ts = Math.floor(new Date(selectedFilters.startDate).getTime() / 1000)
+    if (!Number.isNaN(ts)) clauses.push(`startDate:>=${ts}`)
+  }
+
   if (selectedFilters.onSale) clauses.push(`lowestPrice.${selectedCurrency}.onSale:=true`)
   if (selectedFilters.newTrips) clauses.push(`isNew:=true`)
 
@@ -247,6 +245,7 @@ function ProductSearchPage({ selectedCurrency }) {
   const [query, setQuery] = useState('')
   const [suggestions, setSuggestions] = useState([])
   const [showSuggestions, setShowSuggestions] = useState(false)
+  const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1)
   const searchContainerRef = useRef(null)
   const [sortBy, setSortBy] = useState(SORT_OPTIONS[0].value)
   // appliedFilters are sent to Typesense; pendingDestinations used for Apply behavior
@@ -259,9 +258,12 @@ function ProductSearchPage({ selectedCurrency }) {
     durationMax: '',
     priceMin: '',
     priceMax: '',
+    startDate: '',
     onSale: false,
     newTrips: false,
   })
+  const [showDatePicker, setShowDatePicker] = useState(false)
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
   const [pendingDestinations, setPendingDestinations] = useState([])
   const [products, setProducts] = useState([])
   const [facetCounts, setFacetCounts] = useState([])
@@ -270,14 +272,24 @@ function ProductSearchPage({ selectedCurrency }) {
   const [error, setError] = useState('')
 
   const adjustedSortBy = useMemo(() => {
-    if (!sortBy.includes('price')) {
-      return sortBy
+    switch (sortBy) {
+      case 'relevance':
+        return '_text_match:desc'
+      case 'price_asc':
+        return `lowestPrice.${selectedCurrency}.price:asc`
+      case 'price_desc':
+        return `lowestPrice.${selectedCurrency}.price:desc`
+      case 'duration_asc':
+        return 'duration:asc'
+      case 'duration_desc':
+        return 'duration:desc'
+      case 'rating_desc':
+        return 'reviewRating:desc'
+      case 'startDate_asc':
+        return 'startDate:asc'
+      default:
+        return '_text_match:desc'
     }
-    // Convert price sort to use nested lowestPrice field
-    // e.g., 'price_usd:asc' becomes 'lowestPrice.usd.price:asc'
-    const direction = sortBy.includes(':asc') ? ':asc' : ':desc'
-    const currencyField = `lowestPrice.${selectedCurrency}.price`
-    return `${currencyField}${direction}`
   }, [sortBy, selectedCurrency])
 
   const marketingRegionOptions = useMemo(() => {
@@ -487,6 +499,7 @@ function ProductSearchPage({ selectedCurrency }) {
 
         setSuggestions(items.slice(0, 5))
         setShowSuggestions(items.length > 0)
+        setSelectedSuggestionIndex(-1)
       } catch (err) {
         console.error('Suggestion fetch error', err)
         setSuggestions([])
@@ -494,7 +507,7 @@ function ProductSearchPage({ selectedCurrency }) {
       }
     }
 
-    const t = window.setTimeout(() => fetchSuggestions(), 200)
+    const t = window.setTimeout(() => fetchSuggestions(), 300)
 
     return () => {
       isActive = false
@@ -522,11 +535,58 @@ function ProductSearchPage({ selectedCurrency }) {
       physicalRating: [],
       durationMin: '',
       durationMax: '',
+      priceMin: '',
+      priceMax: '',
+      startDate: '',
       onSale: false,
       newTrips: false,
     })
     setPendingDestinations([])
   }
+
+  // Restore state from URL on mount
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const q = params.get('q') || ''
+    const regions = params.get('regions')
+    const styles = params.get('styles')
+    const themes = params.get('themes')
+    const physical = params.get('physical')
+    const durationMin = params.get('durationMin') || ''
+    const durationMax = params.get('durationMax') || ''
+    const startDate = params.get('startDate') || ''
+    const sort = params.get('sort') || sortBy
+
+    if (q) setQuery(q)
+    setSortBy(sort)
+    setAppliedFilters((c) => ({
+      ...c,
+      marketingRegions: regions ? regions.split(',').filter(Boolean) : c.marketingRegions,
+      styles: styles ? styles.split(',').filter(Boolean) : c.styles,
+      themes: themes ? themes.split(',').filter(Boolean) : c.themes,
+      physicalRating: physical ? physical.split(',').map((v) => Number(v)).filter(Boolean) : c.physicalRating,
+      durationMin,
+      durationMax,
+      startDate,
+    }))
+    if (regions) setPendingDestinations(regions.split(',').filter(Boolean))
+  }, [])
+
+  // Push state to URL when key params change
+  useEffect(() => {
+    const params = new URLSearchParams()
+    if (query) params.set('q', query)
+    if (appliedFilters.marketingRegions.length) params.set('regions', appliedFilters.marketingRegions.join(','))
+    if (appliedFilters.styles.length) params.set('styles', appliedFilters.styles.join(','))
+    if (appliedFilters.themes.length) params.set('themes', appliedFilters.themes.join(','))
+    if (appliedFilters.physicalRating.length) params.set('physical', appliedFilters.physicalRating.join(','))
+    if (appliedFilters.durationMin) params.set('durationMin', appliedFilters.durationMin)
+    if (appliedFilters.durationMax) params.set('durationMax', appliedFilters.durationMax)
+    if (appliedFilters.startDate) params.set('startDate', appliedFilters.startDate)
+    if (sortBy) params.set('sort', sortBy)
+    const newUrl = `${window.location.pathname}?${params.toString()}`
+    window.history.replaceState({}, '', newUrl)
+  }, [query, appliedFilters, sortBy])
 
   const [collapsed, setCollapsed] = useState({
     destinations: false,
@@ -602,6 +662,27 @@ function ProductSearchPage({ selectedCurrency }) {
               onChange={(event) => {
                 setQuery(event.target.value)
               }}
+              onKeyDown={(e) => {
+                if (!showSuggestions || suggestions.length === 0) return
+                if (e.key === 'ArrowDown') {
+                  e.preventDefault()
+                  setSelectedSuggestionIndex((i) => Math.min(suggestions.length - 1, i + 1))
+                } else if (e.key === 'ArrowUp') {
+                  e.preventDefault()
+                  setSelectedSuggestionIndex((i) => Math.max(-1, i - 1))
+                } else if (e.key === 'Enter') {
+                  if (selectedSuggestionIndex >= 0 && suggestions[selectedSuggestionIndex]) {
+                    e.preventDefault()
+                    const val = suggestions[selectedSuggestionIndex]
+                    setQuery(val)
+                    setShowSuggestions(false)
+                    setSelectedSuggestionIndex(-1)
+                  }
+                } else if (e.key === 'Escape') {
+                  setShowSuggestions(false)
+                  setSelectedSuggestionIndex(-1)
+                }
+              }}
               onFocus={() => { if (query) setShowSuggestions(true) }}
               aria-label="Search trips"
             />
@@ -622,16 +703,29 @@ function ProductSearchPage({ selectedCurrency }) {
 
           <div className="search-divider" aria-hidden="true" />
 
-          <div className="search-dates visual-only">
+          <button className="filters-toggle" onClick={() => setMobileFiltersOpen((s) => !s)} aria-label="Toggle filters">
+            Filters
+          </button>
+
+          <div className="search-dates" onClick={() => setShowDatePicker((s) => !s)} role="button" tabIndex={0} aria-label="Start date">
             <span className="calendar-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24">
-                <path
-                  d="M7 2h2v2h6V2h2v2h3v18H4V4h3V2zm12 8H5v9h14v-9z"
-                  fill="currentColor"
-                />
+                <path d="M7 2h2v2h6V2h2v2h3v18H4V4h3V2zm12 8H5v9h14v-9z" fill="currentColor" />
               </svg>
             </span>
-            <div className="start-date-label">Start date</div>
+            <div className="start-date-label">{appliedFilters.startDate ? new Date(appliedFilters.startDate).toLocaleDateString() : 'Start date'}</div>
+            {showDatePicker ? (
+              <input
+                type="date"
+                className="start-date-picker"
+                value={appliedFilters.startDate || ''}
+                onChange={(e) => {
+                  const v = e.target.value
+                  setAppliedFilters((c) => ({ ...c, startDate: v }))
+                  setShowDatePicker(false)
+                }}
+              />
+            ) : null}
           </div>
 
           <button type="button" className="search-button" onClick={() => { /* visual-only, main search reacts to query */ }}>
@@ -648,17 +742,20 @@ function ProductSearchPage({ selectedCurrency }) {
             <div className="suggestions-dropdown" role="listbox">
               <div className="suggestions-title">SUGGESTED SEARCHES</div>
               <ul>
-                {suggestions.map((sug) => (
+                {suggestions.map((sug, idx) => (
                   <li
                     key={sug}
-                    className="suggestion-item"
+                    className={"suggestion-item" + (idx === selectedSuggestionIndex ? ' selected' : '')}
                     role="option"
+                    aria-selected={idx === selectedSuggestionIndex}
                     onMouseDown={(e) => {
                       // prevent blur before click
                       e.preventDefault()
                       setQuery(sug)
                       setShowSuggestions(false)
+                      setSelectedSuggestionIndex(-1)
                     }}
+                    onMouseEnter={() => setSelectedSuggestionIndex(idx)}
                     onClick={() => { /* click handled onMouseDown */ }}
                   >
                     <span className="suggestion-icon" aria-hidden="true">🔍</span>
@@ -686,6 +783,13 @@ function ProductSearchPage({ selectedCurrency }) {
           </div>
         ))}
 
+        {appliedFilters.startDate ? (
+          <div key={`chip-date`} className="chip">
+            <span>{new Date(appliedFilters.startDate).toLocaleDateString()}</span>
+            <button onClick={() => setAppliedFilters((c) => ({ ...c, startDate: '' }))}>×</button>
+          </div>
+        ) : null}
+
         {(appliedFilters.marketingRegions.length || appliedFilters.styles.length) ? (
           <button className="clear-all" onClick={clearFilters}>Clear all filters</button>
         ) : null}
@@ -706,7 +810,12 @@ function ProductSearchPage({ selectedCurrency }) {
         </div>
 
         <div className="results-layout">
-          <aside className="filters">
+          <aside className={mobileFiltersOpen ? 'filters mobile-open' : 'filters'}>
+              {mobileFiltersOpen ? (
+                <div style={{display:'flex', justifyContent:'flex-end', marginBottom:8}}>
+                  <button className="clear-all" onClick={() => setMobileFiltersOpen(false)}>Close</button>
+                </div>
+              ) : null}
               <div className="filter-block">
                 <div className="filter-header filter-section-header">
                   <div className={collapsed.destinations ? 'collapsible closed' : 'collapsible'} onClick={() => toggleCollapse('destinations')}>
@@ -946,8 +1055,9 @@ function ProductSearchPage({ selectedCurrency }) {
             {!isLoading && !error && hasResults ? (
               <div className="cards-grid">
                 {products.map((product) => {
-                  const heroImage = buildAssetUrl(product.productImages?.[0]?.url || product.map?.url)
+                  const heroImage = buildAssetUrl(product.map?.url || product.productImages?.[0]?.url)
                   const heroAlt = product.productImages?.[0]?.alt || product.map?.alt || product.name
+                  const priceInfo = getLowestPrice(product.lowestPrice, selectedCurrency)
 
                   return (
                   <article key={product.productId ?? product.id} className="trip-card">
@@ -1024,14 +1134,17 @@ function ProductSearchPage({ selectedCurrency }) {
                         </button>
                       </div>
 
-                      {getLowestPrice(product.lowestPrice, selectedCurrency)?.price ? (
+                      {priceInfo?.price ? (
                         <div className="price-row">
                           <div className="price-text">
                             <span>From</span>
                             <strong>
-                              {getLowestPrice(product.lowestPrice, selectedCurrency).currency}{' '}
-                              {Math.round(getLowestPrice(product.lowestPrice, selectedCurrency).price)}
+                              {priceInfo.currency}{' '}
+                              {Math.round(priceInfo.price)}
                             </strong>
+                            {priceInfo.onSale && priceInfo.originalPrice && priceInfo.originalPrice > priceInfo.price ? (
+                              <div className="product-card-price-compare">{priceInfo.currency} {Math.round(priceInfo.originalPrice)}</div>
+                            ) : null}
                           </div>
                           <div className="price-meta">
                             {product.productCode && <div className="product-code">{product.productCode}</div>}

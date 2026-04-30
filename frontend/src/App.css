@@ -262,6 +262,14 @@ button {
   font-size: 0.95rem;
 }
 
+.start-date-picker {
+  margin-left: 8px;
+  border: 1px solid var(--border);
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: #fff;
+}
+
 .calendar-icon svg {
   width: 18px;
   height: 18px;
@@ -288,6 +296,15 @@ button {
   align-items: center;
   gap: 8px;
   white-space: nowrap;
+}
+
+.filters-toggle {
+  display: none;
+  border: 1px solid var(--border);
+  background: #fff;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-weight: 700;
 }
 
 .search-button svg {
@@ -358,6 +375,10 @@ button {
   background: var(--surface-muted);
 }
 
+.suggestion-item.selected {
+  background: #f3efea;
+}
+
 .suggestion-icon {
   width: 28px;
   height: 28px;
@@ -410,6 +431,17 @@ button {
   padding: 14px;
   height: fit-content;
   box-shadow: 0 10px 24px rgba(30, 30, 30, 0.05);
+}
+
+.filters.mobile-open {
+  position: fixed;
+  top: 72px;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  z-index: 80;
+  overflow: auto;
+  border-radius: 12px;
 }
 
 .filter-block {
@@ -1383,6 +1415,20 @@ button {
   .search-dates {
     width: 100%;
     justify-content: space-between;
+  }
+
+  .filters-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .filters {
+    display: none;
+  }
+
+  .filters.mobile-open {
+    display: block;
   }
 
   .results-layout {
