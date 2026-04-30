@@ -66,6 +66,12 @@ const SEARCH_FIELDS =
 
 const FACET_FIELDS = 'marketingRegions,styles'
 
+// UI -> stored value mapping for styles/themes where display differs from stored data
+const STYLE_UI_TO_VALUE = {
+  Basix: 'Basic',
+}
+const STYLE_VALUE_TO_UI = Object.fromEntries(Object.entries(STYLE_UI_TO_VALUE).map(([k,v]) => [v,k]))
+
 const DEFAULT_FILTERS = {
   marketingRegion: 'all',
   style: 'all',
@@ -293,49 +299,82 @@ function ProductSearchPage({ selectedCurrency }) {
   }, [sortBy, selectedCurrency])
 
   const marketingRegionOptions = useMemo(() => {
-    const facetData = getFacetOptions(facetCounts, 'marketingRegions')
-    const optionsMap = new Map()
-    facetData.forEach((o) => optionsMap.set(o.label, o.count))
-
-    // Ensure selected applied and pending values remain visible
-    ;[...appliedFilters.marketingRegions, ...pendingDestinations].forEach((v) => {
-      if (v && !optionsMap.has(v)) optionsMap.set(v, 0)
-    })
-
-    if (optionsMap.size > 0) {
-      return Array.from(optionsMap).map(([label, count]) => ({ label, count }))
-    }
-
-    // fallback from product data
+    // Compute counts from unique products so facet counts reflect product counts
     const regionMap = new Map()
     products.forEach((product) => {
       if (Array.isArray(product.marketingRegions)) {
-        product.marketingRegions.forEach((region) => {
+        // count each product once per region
+        const unique = Array.from(new Set(product.marketingRegions))
+        unique.forEach((region) => {
           regionMap.set(region, (regionMap.get(region) || 0) + 1)
         })
       }
     })
+
+    // Ensure selected applied and pending values remain visible
+    ;[...appliedFilters.marketingRegions, ...pendingDestinations].forEach((v) => {
+      if (v && !regionMap.has(v)) regionMap.set(v, 0)
+    })
+
     return Array.from(regionMap).map(([label, count]) => ({ label, count }))
   }, [facetCounts, products, appliedFilters.marketingRegions, pendingDestinations])
 
   const styleOptions = useMemo(() => {
-    const facetData = getFacetOptions(facetCounts, 'styles')
-    const optionsMap = new Map()
-    facetData.forEach((o) => optionsMap.set(o.label, o.count))
-    // keep selected visible
-    appliedFilters.styles.forEach((v) => { if (v && !optionsMap.has(v)) optionsMap.set(v, 0) })
-    if (optionsMap.size > 0) return Array.from(optionsMap).map(([label, count]) => ({ label, count }))
-
+    // Compute counts from unique products and normalize UI labels
     const styleMap = new Map()
     products.forEach((product) => {
       if (Array.isArray(product.styles)) {
-        product.styles.forEach((style) => {
-          styleMap.set(style, (styleMap.get(style) || 0) + 1)
+        const unique = Array.from(new Set(product.styles))
+        unique.forEach((styleVal) => {
+          // normalize stored value to UI label if needed
+          const uiLabel = STYLE_VALUE_TO_UI[styleVal] || styleVal
+          styleMap.set(uiLabel, (styleMap.get(uiLabel) || 0) + 1)
         })
       }
     })
+
+    // Ensure selected visible (appliedFilters stores stored-values)
+    appliedFilters.styles.forEach((storedVal) => {
+      const uiLabel = STYLE_VALUE_TO_UI[storedVal] || storedVal
+      if (uiLabel && !styleMap.has(uiLabel)) styleMap.set(uiLabel, 0)
+    })
+
     return Array.from(styleMap).map(([label, count]) => ({ label, count }))
   }, [facetCounts, products, appliedFilters.styles])
+
+  const themeOptions = useMemo(() => {
+    const map = new Map()
+    products.forEach((product) => {
+      if (Array.isArray(product.themes)) {
+        const unique = Array.from(new Set(product.themes))
+        unique.forEach((t) => map.set(t, (map.get(t) || 0) + 1))
+      }
+    })
+    appliedFilters.themes.forEach((v) => { if (v && !map.has(v)) map.set(v, 0) })
+    return Array.from(map).map(([label, count]) => ({ label, count }))
+  }, [products, appliedFilters.themes])
+
+  const physicalCounts = useMemo(() => {
+    const map = new Map()
+    products.forEach((product) => {
+      const val = product.physicalRating
+      if (val !== undefined && val !== null) {
+        map.set(val, (map.get(val) || 0) + 1)
+      }
+    })
+    return map
+  }, [products])
+
+  const onSaleCount = useMemo(() => {
+    let c = 0
+    products.forEach((product) => {
+      const lp = product.lowestPrice
+      if (!lp) return
+      const pData = (lp && lp[selectedCurrency]) || lp.usd || Object.values(lp)[0]
+      if (pData && pData.onSale) c += 1
+    })
+    return c
+  }, [products, selectedCurrency])
 
   useEffect(() => {
     let isActive = true
@@ -359,7 +398,8 @@ function ProductSearchPage({ selectedCurrency }) {
           .documents()
           .search({
             ...buildSearchQuery(query, adjustedSortBy, appliedFilters, selectedCurrency),
-            facet_by: 'marketingRegions,styles,themes,physicalRating',
+            facet_by: 'marketingRegions,styles,themes,physicalRating,productId',
+            max_facet_values: 2000,
           })
 
         if (!isActive) {
@@ -379,7 +419,10 @@ function ProductSearchPage({ selectedCurrency }) {
         const groupedDocuments = Array.from(groupedMap.values())
 
         setProducts(groupedDocuments)
-        setTotalFound(groupedDocuments.length)
+        // Prefer productId facet counts (unique products) if present, otherwise fallback
+        const productFacet = (response.facet_counts || []).find((f) => f.field_name === 'productId')
+        const uniqueProducts = productFacet && Array.isArray(productFacet.counts) ? productFacet.counts.length : groupedDocuments.length
+        setTotalFound(uniqueProducts)
         setFacetCounts(response.facet_counts ?? [])
       } catch (searchError) {
         if (!isActive) {
@@ -776,12 +819,15 @@ function ProductSearchPage({ selectedCurrency }) {
           </div>
         ))}
 
-        {appliedFilters.styles.map((s) => (
-          <div key={`chip-s-${s}`} className="chip">
-            <span>{s}</span>
-            <button onClick={() => setAppliedFilters((c) => ({ ...c, styles: c.styles.filter(x => x !== s) }))}>×</button>
-          </div>
-        ))}
+        {appliedFilters.styles.map((stored) => {
+          const label = STYLE_VALUE_TO_UI[stored] || stored
+          return (
+            <div key={`chip-s-${stored}`} className="chip">
+              <span>{label}</span>
+              <button onClick={() => setAppliedFilters((c) => ({ ...c, styles: c.styles.filter(x => x !== stored) }))}>×</button>
+            </div>
+          )
+        })}
 
         {appliedFilters.startDate ? (
           <div key={`chip-date`} className="chip">
@@ -933,7 +979,7 @@ function ProductSearchPage({ selectedCurrency }) {
                     <label className="filter-option" onClick={() => setAppliedFilters((c) => ({ ...c, onSale: !c.onSale }))}>
                       <span className={appliedFilters.onSale ? 'checkbox-square checked' : 'checkbox-square'} aria-hidden="true">{appliedFilters.onSale ? '✓' : ''}</span>
                       <span className="filter-option-label">Trips on sale</span>
-                      <span className="count-badge">{getFacetCount('on_sale_aud', true) || ''}</span>
+                      <span className="count-badge">{onSaleCount ?? ''}</span>
                     </label>
                     <label className="filter-option">
                       <span className={false ? 'checkbox-square checked' : 'checkbox-square'} aria-hidden="true"></span>
@@ -965,13 +1011,15 @@ function ProductSearchPage({ selectedCurrency }) {
                 </div>
                 {!collapsed.styles ? (
                   <div className="filter-options">
-                    {['Basix','Original','Comfort','Premium'].map((option) => {
-                      const checked = appliedFilters.styles.includes(option)
+                    {styleOptions.map((opt) => {
+                      const uiLabel = opt.label
+                      const storedVal = STYLE_UI_TO_VALUE[uiLabel] || uiLabel
+                      const checked = appliedFilters.styles.includes(storedVal)
                       return (
-                        <label key={option} className="filter-option" onClick={() => setAppliedFilters((c) => ({ ...c, styles: c.styles.includes(option) ? c.styles.filter(x => x !== option) : [...c.styles, option] }))}>
+                        <label key={uiLabel} className="filter-option" onClick={() => setAppliedFilters((c) => ({ ...c, styles: c.styles.includes(storedVal) ? c.styles.filter(x => x !== storedVal) : [...c.styles, storedVal] }))}>
                           <span className={checked ? 'checkbox-square checked' : 'checkbox-square'} aria-hidden="true">{checked ? '✓' : ''}</span>
-                          <span className="filter-option-label">{option}</span>
-                          <span className="count-badge">{getFacetCount('styles', option) ?? 0}</span>
+                          <span className="filter-option-label">{uiLabel}</span>
+                          <span className="count-badge">{opt.count ?? 0}</span>
                         </label>
                       )
                     })}
@@ -999,7 +1047,7 @@ function ProductSearchPage({ selectedCurrency }) {
                         <label key={n} className="filter-option" onClick={() => setAppliedFilters((c) => ({ ...c, physicalRating: c.physicalRating.includes(n) ? c.physicalRating.filter(x => x !== n) : [...c.physicalRating, n] }))}>
                           <span className={checked ? 'checkbox-square checked' : 'checkbox-square'} aria-hidden="true">{checked ? '✓' : ''}</span>
                           <span className="filter-option-label">{n} <span style={{color:'var(--ink-muted)', fontWeight:600}}>&nbsp;stars</span></span>
-                          <span className="count-badge">{getFacetCount('physicalRating', n) ?? 0}</span>
+                          <span className="count-badge">{physicalCounts.get(n) ?? 0}</span>
                         </label>
                       )
                     })}
@@ -1021,7 +1069,7 @@ function ProductSearchPage({ selectedCurrency }) {
                 </div>
                 {!collapsed.themes ? (
                   <div className="filter-options">
-                    {getFacetOptions(facetCounts, 'themes').map((opt) => {
+                    {themeOptions.map((opt) => {
                       const checked = appliedFilters.themes.includes(opt.label)
                       return (
                         <label key={opt.label} className="filter-option" onClick={() => setAppliedFilters((c) => ({ ...c, themes: c.themes.includes(opt.label) ? c.themes.filter(x => x !== opt.label) : [...c.themes, opt.label] }))}>
