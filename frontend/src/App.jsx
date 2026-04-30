@@ -2,17 +2,17 @@ import { useEffect, useMemo, useState } from 'react'
 import Typesense from 'typesense'
 import './App.css'
 
-const typesenseClient = new Typesense.Client({
+const client = new Typesense.Client({
   nodes: [
     {
-      host: 'localhost',
-      port: 8108,
-      protocol: 'http',
-    },
+      host: "t13xazwfmsn2bu0kp-1.a2.typesense.net",
+      port: 443,
+      protocol: "https"
+    }
   ],
-  apiKey: 'xyz',
-  connectionTimeoutSeconds: 5,
-})
+  apiKey: "X5w9IBpJCxQu3DC2utYt3IUJeAbdak3E", // VERY IMPORTANT
+  connectionTimeoutSeconds: 2
+});
 
 const CARD_IMAGES = ['image-1', 'image-2', 'image-3', 'image-4']
 
@@ -174,14 +174,16 @@ function buildSearchQuery(query, sortBy, filters) {
 
 function FilterOption({ label, count, active, onClick }) {
   return (
-    <button
-      type="button"
-      className={active ? 'filter-option active' : 'filter-option'}
-      onClick={onClick}
-    >
+    <label className={active ? 'filter-option active' : 'filter-option'}>
+      <input
+        type="checkbox"
+        checked={active}
+        onChange={onClick}
+        aria-label={label}
+      />
       <span className="filter-option-label">{label}</span>
       {typeof count === 'number' ? <span className="filter-option-count">{count}</span> : null}
-    </button>
+    </label>
   )
 }
 
@@ -230,7 +232,7 @@ function App() {
       setError('')
 
       try {
-        const response = await typesenseClient
+        const response = await client
           .collections('travel_departures')
           .documents()
           .search(buildSearchQuery(query, adjustedSortBy, filters))
@@ -283,65 +285,63 @@ function App() {
   return (
     <div className="app">
       <header className="topbar">
-        <div className="logo">
-          <span className="logo-mark" aria-hidden="true">
-            T
-          </span>
-          <div>
-            <span className="logo-title">Typesense Travel POC</span>
-            <span className="logo-subtitle">Departure discovery demo</span>
+        <div className="topbar-inner">
+          <div className="logo">
+            <span className="logo-mark" aria-hidden="true">
+              T
+            </span>
+            <div>
+              <span className="logo-title">Typesense Travel POC</span>
+            </div>
           </div>
-        </div>
 
-        <div className="topbar-actions">
-          <button type="button" className="icon-button" aria-label="Saved trips">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                d="M12 20.5l-1.45-1.32C5.4 14.36 2 11.28 2 7.5 2 5 4 3 6.5 3c1.74 0 3.41.81 4.5 2.09C12.09 3.81 13.76 3 15.5 3 18 3 20 5 20 7.5c0 3.78-3.4 6.86-8.55 11.68L12 20.5z"
-                fill="currentColor"
-              />
-            </svg>
-          </button>
-          <button type="button" className="icon-button" aria-label="Profile">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                d="M12 12c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm0 2c-3.33 0-10 1.67-10 5v3h20v-3c0-3.33-6.67-5-10-5z"
-                fill="currentColor"
-              />
-            </svg>
-          </button>
-          <button type="button" className="icon-button" aria-label="Support">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                d="M12 1a9 9 0 00-9 9v3a2 2 0 002 2h1v-6H5a7 7 0 0114 0h-1v6h1a2 2 0 002-2v-3a9 9 0 00-9-9z"
-                fill="currentColor"
-              />
-            </svg>
-          </button>
-          <a className="cta" href="#results">
-            Explore trips
-          </a>
+          <nav className="nav-links" aria-label="Primary">
+            <a href="#results">Destinations</a>
+            <a href="#results">Ways to travel</a>
+            <a href="#results">Deals</a>
+            <a href="#results">About</a>
+          </nav>
+
+          <div className="topbar-actions">
+            <button type="button" className="icon-button" aria-label="Saved trips">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M12 20.5l-1.45-1.32C5.4 14.36 2 11.28 2 7.5 2 5 4 3 6.5 3c1.74 0 3.41.81 4.5 2.09C12.09 3.81 13.76 3 15.5 3 18 3 20 5 20 7.5c0 3.78-3.4 6.86-8.55 11.68L12 20.5z"
+                  fill="currentColor"
+                />
+              </svg>
+            </button>
+            <button type="button" className="icon-button" aria-label="Profile">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M12 12c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm0 2c-3.33 0-10 1.67-10 5v3h20v-3c0-3.33-6.67-5-10-5z"
+                  fill="currentColor"
+                />
+              </svg>
+            </button>
+            <button type="button" className="icon-button" aria-label="Support">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M12 1a9 9 0 00-9 9v3a2 2 0 002 2h1v-6H5a7 7 0 0114 0h-1v6h1a2 2 0 002-2v-3a9 9 0 00-9-9z"
+                  fill="currentColor"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
       </header>
 
       <main>
-        <section className="region-selector" aria-label="Select region">
-          <label htmlFor="region-dropdown">Change region</label>
-          <select
-            id="region-dropdown"
-            value={selectedRegion}
-            onChange={(event) => setSelectedRegion(event.target.value)}
-            className="region-dropdown"
-          >
-            {REGION_CONFIG.map((region) => (
-              <option key={region.label} value={region.label}>
-                {region.label}
-              </option>
-            ))}
-          </select>
+        <section className="breadcrumb" aria-label="Breadcrumb">
+          <span>Home</span>
+          <span className="breadcrumb-divider" aria-hidden="true">&gt;</span>
+          <span className="breadcrumb-current">Search</span>
         </section>
 
         <section className="search-strip" aria-label="Search">
+          <div className="search-count">
+            <strong>{isLoading ? '...' : totalFound.toLocaleString()}</strong> trips found
+          </div>
           <div className="search-pill">
             <div className="search-input">
               <span className="search-icon" aria-hidden="true">
@@ -360,33 +360,37 @@ function App() {
                 aria-label="Search trips"
               />
             </div>
-            <button type="button" className="search-button">
-              Search
-            </button>
-          </div>
 
-          <div className="search-metrics">
-            <div>
-              <strong>{isLoading ? '...' : totalFound.toLocaleString()}</strong>
-              <span>trips indexed</span>
+            <div className="search-divider" aria-hidden="true" />
+
+            <div className="search-dates">
+              <span className="calendar-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M7 2h2v2h6V2h2v2h3v18H4V4h3V2zm12 8H5v9h14v-9z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </span>
+              <input type="text" placeholder="Start date" aria-label="Start date" />
+              <span aria-hidden="true">to</span>
+              <input type="text" placeholder="End date" aria-label="End date" />
             </div>
-            <div>
-              <strong>{trips.length}</strong>
-              <span>results shown</span>
-            </div>
-            <div>
-              <strong>{filters.availability === 'available' ? 'Open' : 'Live'}</strong>
-              <span>availability</span>
-            </div>
+
+            <button type="button" className="search-button">
+              <span>Search</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M11 2a9 9 0 106.32 15.32l3.18 3.18 1.5-1.5-3.18-3.18A9 9 0 0011 2zm0 2a7 7 0 110 14 7 7 0 010-14z"
+                  fill="currentColor"
+                />
+              </svg>
+            </button>
           </div>
         </section>
 
         <section className="results" id="results" aria-live="polite">
-          <div className="results-header">
-            <div>
-              <p className="eyebrow">Search</p>
-              <h2>{isLoading ? 'Loading trips...' : `${totalFound.toLocaleString()} trips found`}</h2>
-            </div>
+          <div className="results-toolbar">
             <div className="sort-control">
               <span>Sort by</span>
               <select value={sortBy} onChange={(event) => setSortBy(event.target.value)}>
@@ -403,23 +407,12 @@ function App() {
             <aside className="filters">
               <div className="filter-block">
                 <div className="filter-header">
-                  <h3>Marketing region</h3>
+                  <h3>Destinations</h3>
                   <button type="button" onClick={() => setFilters((current) => ({ ...current, marketingRegion: 'all' }))}>
                     Clear
                   </button>
                 </div>
                 <div className="filter-options">
-                  <FilterOption
-                    label="All regions"
-                    count={totalFound}
-                    active={filters.marketingRegion === 'all'}
-                    onClick={() =>
-                      setFilters((current) => ({
-                        ...current,
-                        marketingRegion: 'all',
-                      }))
-                    }
-                  />
                   {marketingRegionOptions.map((option) => (
                     <FilterOption
                       key={option.label}
@@ -435,26 +428,87 @@ function App() {
                     />
                   ))}
                 </div>
+                <button type="button" className="filter-apply">
+                  Apply
+                </button>
               </div>
 
               <div className="filter-block">
                 <div className="filter-header">
-                  <h3>Style</h3>
+                  <h3>Duration</h3>
+                  <button type="button">Any</button>
+                </div>
+                <div className="filter-range">
+                  <label>
+                    Min
+                    <select defaultValue="Any">
+                      <option>Any</option>
+                      <option>3</option>
+                      <option>7</option>
+                      <option>10</option>
+                      <option>14</option>
+                    </select>
+                  </label>
+                  <span>to</span>
+                  <label>
+                    Max
+                    <select defaultValue="Any">
+                      <option>Any</option>
+                      <option>10</option>
+                      <option>14</option>
+                      <option>21</option>
+                      <option>30</option>
+                    </select>
+                  </label>
+                </div>
+              </div>
+
+              <div className="filter-block">
+                <div className="filter-header">
+                  <h3>Price</h3>
+                  <button type="button">Any</button>
+                </div>
+                <div className="filter-range">
+                  <label>
+                    Min
+                    <input type="text" placeholder="€" />
+                  </label>
+                  <span>to</span>
+                  <label>
+                    Max
+                    <input type="text" placeholder="€" />
+                  </label>
+                </div>
+              </div>
+
+              <div className="filter-block">
+                <div className="filter-header">
+                  <h3>Travel deals</h3>
+                </div>
+                <div className="filter-options">
+                  <label className="filter-option">
+                    <input type="checkbox" />
+                    <span className="filter-option-label">Trips on sale</span>
+                  </label>
+                  <label className="filter-option">
+                    <input type="checkbox" />
+                    <span className="filter-option-label">Early bird</span>
+                  </label>
+                  <label className="filter-option">
+                    <input type="checkbox" />
+                    <span className="filter-option-label">Last minute deals</span>
+                  </label>
+                </div>
+              </div>
+
+              <div className="filter-block">
+                <div className="filter-header">
+                  <h3>Styles</h3>
                   <button type="button" onClick={() => setFilters((current) => ({ ...current, style: 'all' }))}>
                     Clear
                   </button>
                 </div>
                 <div className="filter-options">
-                  <FilterOption
-                    label="All styles"
-                    active={filters.style === 'all'}
-                    onClick={() =>
-                      setFilters((current) => ({
-                        ...current,
-                        style: 'all',
-                      }))
-                    }
-                  />
                   {styleOptions.map((option) => (
                     <FilterOption
                       key={option.label}
@@ -474,45 +528,37 @@ function App() {
 
               <div className="filter-block">
                 <div className="filter-header">
-                  <h3>Places left</h3>
+                  <h3>Physical rating</h3>
                 </div>
-                <div className="availability-toggle" role="group" aria-label="Places left">
-                  <button
-                    type="button"
-                    className={filters.availability === 'all' ? 'toggle active' : 'toggle'}
-                    onClick={() =>
-                      setFilters((current) => ({
-                        ...current,
-                        availability: 'all',
-                      }))
-                    }
-                  >
-                    Any
-                  </button>
-                  <button
-                    type="button"
-                    className={filters.availability === 'available' ? 'toggle active' : 'toggle'}
-                    onClick={() =>
-                      setFilters((current) => ({
-                        ...current,
-                        availability: 'available',
-                      }))
-                    }
-                  >
-                    Places left
-                  </button>
-                  <button
-                    type="button"
-                    className={filters.availability === 'sold-out' ? 'toggle active' : 'toggle'}
-                    onClick={() =>
-                      setFilters((current) => ({
-                        ...current,
-                        availability: 'sold-out',
-                      }))
-                    }
-                  >
-                    Sold out
-                  </button>
+                <div className="rating-toggle">
+                  <span>Physical rating</span>
+                  <div className="rating-bars" aria-hidden="true">
+                    <span className="bar filled" />
+                    <span className="bar filled" />
+                    <span className="bar filled" />
+                    <span className="bar" />
+                    <span className="bar" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="filter-block">
+                <div className="filter-header">
+                  <h3>Themes</h3>
+                </div>
+                <div className="filter-options">
+                  <label className="filter-option">
+                    <input type="checkbox" />
+                    <span className="filter-option-label">Wildlife</span>
+                  </label>
+                  <label className="filter-option">
+                    <input type="checkbox" />
+                    <span className="filter-option-label">Walking & hiking</span>
+                  </label>
+                  <label className="filter-option">
+                    <input type="checkbox" />
+                    <span className="filter-option-label">Family</span>
+                  </label>
                 </div>
               </div>
 
@@ -565,6 +611,17 @@ function App() {
                           <span className="trip-chip">{trip.startCity || 'Start city'}</span>
                         </div>
 
+                        <div className="rating-toggle card-rating">
+                          <span>Physical rating</span>
+                          <div className="rating-bars" aria-hidden="true">
+                            <span className="bar filled" />
+                            <span className="bar filled" />
+                            <span className="bar filled" />
+                            <span className="bar" />
+                            <span className="bar" />
+                          </div>
+                        </div>
+
                         <div className="card-metrics">
                           <div>
                             <span>Marketing rating</span>
@@ -576,21 +633,32 @@ function App() {
                           </div>
                         </div>
 
+                        <div className="card-actions">
+                          <button type="button" className="compare-button">
+                            + Add to compare
+                          </button>
+                          <button type="button" className="icon-button" aria-label="Compare">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                              <path
+                                d="M7 4h2v16H7V4zm8 0h2v16h-2V4z"
+                                fill="currentColor"
+                              />
+                            </svg>
+                          </button>
+                        </div>
+
                         {getLowestPrice(trip.lowestPrice, selectedCurrency)?.price ? (
-                          <div className={`price-display ${getLowestPrice(trip.lowestPrice, selectedCurrency).onSale ? 'on-sale' : ''}`}>
-                            <span className="price-label">Starting from</span>
-                            <div className="price-amount">
-                              {getLowestPrice(trip.lowestPrice, selectedCurrency).onSale && <span className="sale-badge">🔥 SALE</span>}
-                              <span className="currency">{getLowestPrice(trip.lowestPrice, selectedCurrency).currency}</span>
-                              <span className="amount">{Math.round(getLowestPrice(trip.lowestPrice, selectedCurrency).price)}</span>
+                          <div className="price-row">
+                            <div className="price-text">
+                              <span>From</span>
+                              <strong>
+                                {getLowestPrice(trip.lowestPrice, selectedCurrency).currency}{' '}
+                                {Math.round(getLowestPrice(trip.lowestPrice, selectedCurrency).price)}
+                              </strong>
                             </div>
+                            <div className="price-meta">Lowest price next departure</div>
                           </div>
                         ) : null}
-
-                        <div className="card-footer">
-                          <span className="pill">{trip.closedForBooking ? 'Closed' : 'Open now'}</span>
-                          <span className="pill">{trip.endCity || 'End city'}</span>
-                        </div>
                       </div>
                     </article>
                   ))}
@@ -598,6 +666,22 @@ function App() {
               ) : null}
             </div>
           </div>
+        </section>
+
+        <section className="region-selector" aria-label="Select region">
+          <label htmlFor="region-dropdown">Change region</label>
+          <select
+            id="region-dropdown"
+            value={selectedRegion}
+            onChange={(event) => setSelectedRegion(event.target.value)}
+            className="region-dropdown"
+          >
+            {REGION_CONFIG.map((region) => (
+              <option key={region.label} value={region.label}>
+                {region.label}
+              </option>
+            ))}
+          </select>
         </section>
       </main>
     </div>

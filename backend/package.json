@@ -10,6 +10,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "create:collection": "node scripts/createCollection.js",
     "import:data": "node scripts/importData.js",
+    "import:products": "node scripts/importProducts.js",
     "test:search": "node scripts/searchTest.js"
   },
   "repository": {
@@ -24,6 +25,7 @@
   },
   "homepage": "https://github.com/Bhanuka-Fernando-Intrepid/typesense-poc#readme",
   "dependencies": {
+    "algoliasearch": "^5.51.0",
     "dotenv": "^17.4.2",
     "typesense": "^3.0.6"
   },
