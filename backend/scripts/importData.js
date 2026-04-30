@@ -5,8 +5,20 @@ require("dotenv").config();
 
 const dataPath = path.join(__dirname, "../../data/sample-departures.json");
 const schemaPath = path.join(__dirname, "../../schema/departures.schema.json");
-let data = JSON.parse(fs.readFileSync(dataPath, "utf8"));
+const rawData = fs.readFileSync(dataPath, "utf8");
+let data;
+
+try {
+  data = JSON.parse(rawData);
+} catch (error) {
+  data = rawData
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => JSON.parse(line));
+}
 const schema = JSON.parse(fs.readFileSync(schemaPath, "utf8"));
+const collectionName = schema?.name || "travel_departures";
 
 // Transform data to ensure lowestPrice.*.discountPrice is an integer and populate currency-specific fields for sorting
 data = data.map(doc => {
@@ -46,14 +58,14 @@ data = data.map(doc => {
 
 async function ensureCollectionExists() {
   try {
-    await client.collections("travel_departures").retrieve();
+    await client.collections(collectionName).retrieve();
   } catch (error) {
     if (error?.httpStatus !== 404) {
       throw error;
     }
 
     await client.collections().create(schema);
-    console.log("Collection created: travel_departures");
+    console.log(`Collection created: ${collectionName}`);
   }
 }
 
@@ -62,7 +74,7 @@ async function importData() {
     await ensureCollectionExists();
 
     const res = await client
-      .collections("travel_departures")
+      .collections(collectionName)
       .documents()
       .import(data, { action: "upsert" });
 
