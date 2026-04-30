@@ -168,47 +168,38 @@ function getFacetOptions(facetCounts, fieldName) {
     .filter((entry) => entry.label && entry.label !== 'null' && entry.label !== 'undefined')
 }
 
-function buildFilterBy(filters, selectedCurrency) {
+function buildFilterBy(selectedFilters, selectedCurrency) {
   const clauses = []
 
-  if (filters.marketingRegion !== 'all') {
-    clauses.push(`marketingRegions:=${filters.marketingRegion}`)
+  const escapeBackticks = (s) => String(s).replace(/`/g, "\\`")
+
+  if (Array.isArray(selectedFilters.marketingRegions) && selectedFilters.marketingRegions.length > 0) {
+    const vals = selectedFilters.marketingRegions.map((v) => `\`${escapeBackticks(v)}\``).join(',')
+    clauses.push(`marketingRegions:=[${vals}]`)
   }
 
-  if (filters.style !== 'all') {
-    clauses.push(`styles:=${filters.style}`)
+  if (Array.isArray(selectedFilters.styles) && selectedFilters.styles.length > 0) {
+    const vals = selectedFilters.styles.map((v) => `\`${escapeBackticks(v)}\``).join(',')
+    clauses.push(`styles:=[${vals}]`)
   }
 
-  if (filters.availability === 'available') {
-    clauses.push('hasPlacesLeft:=true && closedForBooking:=false')
+  if (Array.isArray(selectedFilters.themes) && selectedFilters.themes.length > 0) {
+    const vals = selectedFilters.themes.map((v) => `\`${escapeBackticks(v)}\``).join(',')
+    clauses.push(`themes:=[${vals}]`)
   }
 
-  if (filters.availability === 'sold-out') {
-    clauses.push('hasPlacesLeft:=false || closedForBooking:=true')
+  if (Array.isArray(selectedFilters.physicalRating) && selectedFilters.physicalRating.length > 0) {
+    const vals = selectedFilters.physicalRating.map((v) => `\`${escapeBackticks(String(v))}\``).join(',')
+    clauses.push(`physicalRating:=[${vals}]`)
   }
 
-  if (filters.durationMin) {
-    clauses.push(`duration:>=${filters.durationMin}`)
-  }
+  if (selectedFilters.durationMin) clauses.push(`duration:>=${selectedFilters.durationMin}`)
+  if (selectedFilters.durationMax) clauses.push(`duration:<=${selectedFilters.durationMax}`)
+  if (selectedFilters.priceMin) clauses.push(`lowestPrice.${selectedCurrency}.price:>=${selectedFilters.priceMin}`)
+  if (selectedFilters.priceMax) clauses.push(`lowestPrice.${selectedCurrency}.price:<=${selectedFilters.priceMax}`)
 
-  if (filters.durationMax) {
-    clauses.push(`duration:<=${filters.durationMax}`)
-  }
-
-  if (filters.priceMin) {
-    const priceField = `lowestPrice.${selectedCurrency}.price`
-    clauses.push(`${priceField}:>=${filters.priceMin}`)
-  }
-
-  if (filters.priceMax) {
-    const priceField = `lowestPrice.${selectedCurrency}.price`
-    clauses.push(`${priceField}:<=${filters.priceMax}`)
-  }
-
-  if (filters.onSale) {
-    const onSaleField = `lowestPrice.${selectedCurrency}.onSale`
-    clauses.push(`${onSaleField}:=true`)
-  }
+  if (selectedFilters.onSale) clauses.push(`lowestPrice.${selectedCurrency}.onSale:=true`)
+  if (selectedFilters.newTrips) clauses.push(`isNew:=true`)
 
   return clauses.join(' && ')
 }
@@ -258,7 +249,20 @@ function ProductSearchPage({ selectedCurrency }) {
   const [showSuggestions, setShowSuggestions] = useState(false)
   const searchContainerRef = useRef(null)
   const [sortBy, setSortBy] = useState(SORT_OPTIONS[0].value)
-  const [filters, setFilters] = useState(DEFAULT_FILTERS)
+  // appliedFilters are sent to Typesense; pendingDestinations used for Apply behavior
+  const [appliedFilters, setAppliedFilters] = useState({
+    marketingRegions: [],
+    styles: [],
+    themes: [],
+    physicalRating: [],
+    durationMin: '',
+    durationMax: '',
+    priceMin: '',
+    priceMax: '',
+    onSale: false,
+    newTrips: false,
+  })
+  const [pendingDestinations, setPendingDestinations] = useState([])
   const [products, setProducts] = useState([])
   const [facetCounts, setFacetCounts] = useState([])
   const [totalFound, setTotalFound] = useState(0)
@@ -276,51 +280,50 @@ function ProductSearchPage({ selectedCurrency }) {
     return `${currencyField}${direction}`
   }, [sortBy, selectedCurrency])
 
-  const marketingRegionOptions = useMemo(
-    () => {
-      // If facets are available, use them
-      const facetData = getFacetOptions(facetCounts, 'marketingRegions')
-      if (facetData.length > 0) {
-        return facetData
-      }
-      
-      // Otherwise, generate from product data
-      const regionMap = new Map()
-      products.forEach((product) => {
-        if (Array.isArray(product.marketingRegions)) {
-          product.marketingRegions.forEach((region) => {
-            regionMap.set(region, (regionMap.get(region) || 0) + 1)
-          })
-        }
-      })
-      
-      return Array.from(regionMap).map(([label, count]) => ({ label, count }))
-    },
-    [facetCounts, products],
-  )
+  const marketingRegionOptions = useMemo(() => {
+    const facetData = getFacetOptions(facetCounts, 'marketingRegions')
+    const optionsMap = new Map()
+    facetData.forEach((o) => optionsMap.set(o.label, o.count))
 
-  const styleOptions = useMemo(
-    () => {
-      // If facets are available, use them
-      const facetData = getFacetOptions(facetCounts, 'styles')
-      if (facetData.length > 0) {
-        return facetData
+    // Ensure selected applied and pending values remain visible
+    ;[...appliedFilters.marketingRegions, ...pendingDestinations].forEach((v) => {
+      if (v && !optionsMap.has(v)) optionsMap.set(v, 0)
+    })
+
+    if (optionsMap.size > 0) {
+      return Array.from(optionsMap).map(([label, count]) => ({ label, count }))
+    }
+
+    // fallback from product data
+    const regionMap = new Map()
+    products.forEach((product) => {
+      if (Array.isArray(product.marketingRegions)) {
+        product.marketingRegions.forEach((region) => {
+          regionMap.set(region, (regionMap.get(region) || 0) + 1)
+        })
       }
-      
-      // Otherwise, generate from product data
-      const styleMap = new Map()
-      products.forEach((product) => {
-        if (Array.isArray(product.styles)) {
-          product.styles.forEach((style) => {
-            styleMap.set(style, (styleMap.get(style) || 0) + 1)
-          })
-        }
-      })
-      
-      return Array.from(styleMap).map(([label, count]) => ({ label, count }))
-    },
-    [facetCounts, products],
-  )
+    })
+    return Array.from(regionMap).map(([label, count]) => ({ label, count }))
+  }, [facetCounts, products, appliedFilters.marketingRegions, pendingDestinations])
+
+  const styleOptions = useMemo(() => {
+    const facetData = getFacetOptions(facetCounts, 'styles')
+    const optionsMap = new Map()
+    facetData.forEach((o) => optionsMap.set(o.label, o.count))
+    // keep selected visible
+    appliedFilters.styles.forEach((v) => { if (v && !optionsMap.has(v)) optionsMap.set(v, 0) })
+    if (optionsMap.size > 0) return Array.from(optionsMap).map(([label, count]) => ({ label, count }))
+
+    const styleMap = new Map()
+    products.forEach((product) => {
+      if (Array.isArray(product.styles)) {
+        product.styles.forEach((style) => {
+          styleMap.set(style, (styleMap.get(style) || 0) + 1)
+        })
+      }
+    })
+    return Array.from(styleMap).map(([label, count]) => ({ label, count }))
+  }, [facetCounts, products, appliedFilters.styles])
 
   useEffect(() => {
     let isActive = true
@@ -342,7 +345,10 @@ function ProductSearchPage({ selectedCurrency }) {
         const response = await client
           .collections(TYPESENSE_COLLECTION)
           .documents()
-          .search(buildSearchQuery(query, adjustedSortBy, filters, selectedCurrency))
+          .search({
+            ...buildSearchQuery(query, adjustedSortBy, appliedFilters, selectedCurrency),
+            facet_by: 'marketingRegions,styles,themes,physicalRating',
+          })
 
         if (!isActive) {
           return
@@ -389,12 +395,13 @@ function ProductSearchPage({ selectedCurrency }) {
       isActive = false
       window.clearTimeout(timer)
     }
-  }, [query, adjustedSortBy, filters, selectedCurrency])
+  }, [query, adjustedSortBy, appliedFilters, selectedCurrency])
 
   // Suggestions fetching (debounced shorter than main search)
   useEffect(() => {
-    if (!query || !TYPESENSE_READY) {
+    if (!query || query.trim().length < 2 || !TYPESENSE_READY) {
       setSuggestions([])
+      setShowSuggestions(false)
       return
     }
 
@@ -403,9 +410,10 @@ function ProductSearchPage({ selectedCurrency }) {
       try {
         const params = {
           q: query.trim(),
-          query_by: 'name,primaryCountry,destinations,locations,marketingRegions,themes,styles',
+          query_by: 'primaryCountry,destinations,locations,regions,name',
+          query_by_weights: '5,4,3,2,1',
           per_page: 8,
-          include_fields: 'name,primaryCountry,destinations,locations',
+          include_fields: 'name,primaryCountry,destinations,locations,regions',
           prefix: true,
         }
 
@@ -422,34 +430,63 @@ function ProductSearchPage({ selectedCurrency }) {
           const s = String(str).trim()
           const key = s.toLowerCase()
           if (!key || seen.has(key)) return
-          // only include if query appears in value (helps relevance)
           if (qLower && key.indexOf(qLower) === -1) return
           seen.add(key)
           items.push(s)
         }
 
+        // Priority: primaryCountry -> destinations -> locations -> regions -> name
         for (const doc of hits) {
-          // primaryCountry
-          pushIf(doc.primaryCountry)
-
-          // destinations array
-          if (Array.isArray(doc.destinations)) {
-            for (const d of doc.destinations) pushIf(d)
-          }
-
-          // locations array
-          if (Array.isArray(doc.locations)) {
-            for (const l of doc.locations) pushIf(l)
-          }
-
-          // trip name
-          pushIf(doc.name)
-
           if (items.length >= 5) break
+          pushIf(doc.primaryCountry)
+        }
+
+        if (items.length < 5) {
+          for (const doc of hits) {
+            if (items.length >= 5) break
+            if (Array.isArray(doc.destinations)) {
+              for (const d of doc.destinations) {
+                pushIf(d)
+                if (items.length >= 5) break
+              }
+            }
+          }
+        }
+
+        if (items.length < 5) {
+          for (const doc of hits) {
+            if (items.length >= 5) break
+            if (Array.isArray(doc.locations)) {
+              for (const l of doc.locations) {
+                pushIf(l)
+                if (items.length >= 5) break
+              }
+            }
+          }
+        }
+
+        if (items.length < 5) {
+          for (const doc of hits) {
+            if (items.length >= 5) break
+            if (Array.isArray(doc.regions)) {
+              for (const r of doc.regions) {
+                pushIf(r)
+                if (items.length >= 5) break
+              }
+            }
+          }
+        }
+
+        // Trip names: avoid short/common-word matches. Only include if query length >=3
+        if (qLower.length >= 3 && items.length < 5) {
+          for (const doc of hits) {
+            if (items.length >= 5) break
+            pushIf(doc.name)
+          }
         }
 
         setSuggestions(items.slice(0, 5))
-        setShowSuggestions(true)
+        setShowSuggestions(items.length > 0)
       } catch (err) {
         console.error('Suggestion fetch error', err)
         setSuggestions([])
@@ -478,7 +515,37 @@ function ProductSearchPage({ selectedCurrency }) {
   }, [])
 
   const clearFilters = () => {
-    setFilters(DEFAULT_FILTERS)
+    setAppliedFilters({
+      marketingRegions: [],
+      styles: [],
+      themes: [],
+      physicalRating: [],
+      durationMin: '',
+      durationMax: '',
+      onSale: false,
+      newTrips: false,
+    })
+    setPendingDestinations([])
+  }
+
+  const [collapsed, setCollapsed] = useState({
+    destinations: false,
+    duration: false,
+    deals: false,
+    physical: false,
+    styles: false,
+    themes: false,
+  })
+
+  function toggleCollapse(key) {
+    setCollapsed((c) => ({ ...c, [key]: !c[key] }))
+  }
+
+  function getFacetCount(field, value) {
+    const fieldObj = facetCounts.find((f) => f.field_name === field)
+    if (!fieldObj || !Array.isArray(fieldObj.counts)) return 0
+    const found = fieldObj.counts.find((c) => String(c.value) === String(value))
+    return found ? found.count : 0
   }
 
   const hasResults = products.length > 0
@@ -503,6 +570,8 @@ function ProductSearchPage({ selectedCurrency }) {
       </>
     )
   }
+
+  
 
   return (
     <>
@@ -602,6 +671,26 @@ function ProductSearchPage({ selectedCurrency }) {
         </div>
       </section>
 
+      <div className="active-chips">
+        {appliedFilters.marketingRegions.map((m) => (
+          <div key={`chip-m-${m}`} className="chip">
+            <span>{m}</span>
+            <button onClick={() => setAppliedFilters((c) => ({ ...c, marketingRegions: c.marketingRegions.filter(x => x !== m) }))}>×</button>
+          </div>
+        ))}
+
+        {appliedFilters.styles.map((s) => (
+          <div key={`chip-s-${s}`} className="chip">
+            <span>{s}</span>
+            <button onClick={() => setAppliedFilters((c) => ({ ...c, styles: c.styles.filter(x => x !== s) }))}>×</button>
+          </div>
+        ))}
+
+        {(appliedFilters.marketingRegions.length || appliedFilters.styles.length) ? (
+          <button className="clear-all" onClick={clearFilters}>Clear all filters</button>
+        ) : null}
+      </div>
+
       <section className="results" id="results" aria-live="polite">
         <div className="results-toolbar">
           <div className="sort-control">
@@ -619,164 +708,222 @@ function ProductSearchPage({ selectedCurrency }) {
         <div className="results-layout">
           <aside className="filters">
               <div className="filter-block">
-                <div className="filter-header">
-                  <h3>Destinations</h3>
-                  <button type="button" onClick={() => setFilters((current) => ({ ...current, marketingRegion: 'all' }))}>
-                    Clear
-                  </button>
+                <div className="filter-header filter-section-header">
+                  <div className={collapsed.destinations ? 'collapsible closed' : 'collapsible'} onClick={() => toggleCollapse('destinations')}>
+                    <span className="arrow">▾</span>
+                    <h3>Destinations</h3>
+                  </div>
+                  <div>
+                    {appliedFilters.marketingRegions.length > 0 ? (
+                      <button type="button" onClick={() => { setAppliedFilters((c) => ({ ...c, marketingRegions: [] })); setPendingDestinations([]) }}>Reset</button>
+                    ) : null}
+                  </div>
                 </div>
-                <div className="filter-options">
-                  {marketingRegionOptions.map((option) => (
-                    <FilterOption
-                      key={option.label}
-                      label={option.label}
-                      count={option.count}
-                      active={filters.marketingRegion === option.label}
-                      onClick={() =>
-                        setFilters((current) => ({
-                          ...current,
-                          marketingRegion: option.label,
-                        }))
-                      }
-                    />
-                  ))}
-                </div>
-                <button type="button" className="filter-apply">
-                  Apply
-                </button>
+                {!collapsed.destinations ? (
+                  <>
+                    <div className="filter-options">
+                      {marketingRegionOptions.map((option) => {
+                        const checked = pendingDestinations.includes(option.label)
+                        return (
+                          <label key={option.label} className="filter-option" onClick={() => {
+                            setPendingDestinations((current) => current.includes(option.label) ? current.filter(x => x !== option.label) : [...current, option.label])
+                          }}>
+                            <span className={checked ? 'checkbox-square checked' : 'checkbox-square'} aria-hidden="true">{checked ? '✓' : ''}</span>
+                            <span className="filter-option-label">{option.label}</span>
+                            <span className="count-badge">{option.count ?? 0}</span>
+                          </label>
+                        )
+                      })}
+                    </div>
+                    <div style={{ marginTop: 8 }}>
+                      <button type="button" className="filter-apply" onClick={() => setAppliedFilters((c) => ({ ...c, marketingRegions: Array.from(new Set(pendingDestinations)) }))}>
+                        Apply
+                      </button>
+                    </div>
+                  </>
+                ) : null}
               </div>
 
               <div className="filter-block">
-                <div className="filter-header">
-                  <h3>Duration</h3>
-                  <button type="button" onClick={() => setFilters((current) => ({ ...current, durationMin: '', durationMax: '' }))}>
-                    Any
-                  </button>
+                <div className="filter-header filter-section-header">
+                  <div className={collapsed.duration ? 'collapsible closed' : 'collapsible'} onClick={() => toggleCollapse('duration')}>
+                    <span className="arrow">▾</span>
+                    <h3>Duration</h3>
+                  </div>
+                  <div>
+                    {(appliedFilters.durationMin || appliedFilters.durationMax) ? (
+                      <button type="button" onClick={() => setAppliedFilters((c) => ({ ...c, durationMin: '', durationMax: '' }))}>Reset</button>
+                    ) : null}
+                  </div>
                 </div>
-                <div className="filter-range">
-                  <label>
-                    Min
-                    <select value={filters.durationMin} onChange={(event) => setFilters((current) => ({ ...current, durationMin: event.target.value }))}>
-                      <option value="">Any</option>
-                      <option value="3">3</option>
-                      <option value="7">7</option>
-                      <option value="10">10</option>
-                      <option value="14">14</option>
-                    </select>
-                  </label>
-                  <span>to</span>
-                  <label>
-                    Max
-                    <select value={filters.durationMax} onChange={(event) => setFilters((current) => ({ ...current, durationMax: event.target.value }))}>
-                      <option value="">Any</option>
-                      <option value="10">10</option>
-                      <option value="14">14</option>
-                      <option value="21">21</option>
-                      <option value="30">30</option>
-                    </select>
-                  </label>
-                </div>
+                {!collapsed.duration ? (
+                  <div className="filter-range">
+                    <label>
+                      Min
+                      <select value={appliedFilters.durationMin} onChange={(event) => setAppliedFilters((c) => ({ ...c, durationMin: event.target.value }))}>
+                        <option value="">Any</option>
+                        <option value="1">1</option>
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                        <option value="30">30</option>
+                      </select>
+                    </label>
+                    <span>to</span>
+                    <label>
+                      Max
+                      <select value={appliedFilters.durationMax} onChange={(event) => setAppliedFilters((c) => ({ ...c, durationMax: event.target.value }))}>
+                        <option value="">Any</option>
+                        <option value="1">1</option>
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                        <option value="30">30</option>
+                      </select>
+                    </label>
+                  </div>
+                ) : null}
               </div>
 
               <div className="filter-block">
                 <div className="filter-header">
                   <h3>Price ({selectedCurrency.toUpperCase()})</h3>
-                  <button type="button" onClick={() => setFilters((current) => ({ ...current, priceMin: '', priceMax: '' }))}>
+                  <button type="button" onClick={() => setAppliedFilters((current) => ({ ...current, priceMin: '', priceMax: '' }))}>
                     Any
                   </button>
                 </div>
                 <div className="filter-range">
                   <label>
                     Min
-                    <input type="number" placeholder={`Min ${selectedCurrency.toUpperCase()}`} value={filters.priceMin} onChange={(event) => setFilters((current) => ({ ...current, priceMin: event.target.value }))} />
+                    <input type="number" placeholder={`Min ${selectedCurrency.toUpperCase()}`} value={appliedFilters.priceMin} onChange={(event) => setAppliedFilters((current) => ({ ...current, priceMin: event.target.value }))} />
                   </label>
                   <span>to</span>
                   <label>
                     Max
-                    <input type="number" placeholder={`Max ${selectedCurrency.toUpperCase()}`} value={filters.priceMax} onChange={(event) => setFilters((current) => ({ ...current, priceMax: event.target.value }))} />
+                    <input type="number" placeholder={`Max ${selectedCurrency.toUpperCase()}`} value={appliedFilters.priceMax} onChange={(event) => setAppliedFilters((current) => ({ ...current, priceMax: event.target.value }))} />
                   </label>
                 </div>
               </div>
 
               <div className="filter-block">
-                <div className="filter-header">
-                  <h3>Travel deals</h3>
-                </div>
-                <div className="filter-options">
-                  <label className="filter-option">
-                    <input type="checkbox" checked={filters.onSale} onChange={(event) => setFilters((current) => ({ ...current, onSale: event.target.checked }))} />
-                    <span className="filter-option-label">Trips on sale</span>
-                  </label>
-                  <label className="filter-option">
-                    <input type="checkbox" />
-                    <span className="filter-option-label">Early bird</span>
-                  </label>
-                  <label className="filter-option">
-                    <input type="checkbox" />
-                    <span className="filter-option-label">Last minute deals</span>
-                  </label>
-                </div>
-              </div>
-
-              <div className="filter-block">
-                <div className="filter-header">
-                  <h3>Styles</h3>
-                  <button type="button" onClick={() => setFilters((current) => ({ ...current, style: 'all' }))}>
-                    Clear
-                  </button>
-                </div>
-                <div className="filter-options">
-                  {styleOptions.map((option) => (
-                    <FilterOption
-                      key={option.label}
-                      label={option.label}
-                      count={option.count}
-                      active={filters.style === option.label}
-                      onClick={() =>
-                        setFilters((current) => ({
-                          ...current,
-                          style: option.label,
-                        }))
-                      }
-                    />
-                  ))}
-                </div>
-              </div>
-
-              <div className="filter-block">
-                <div className="filter-header">
-                  <h3>Physical rating</h3>
-                </div>
-                <div className="rating-toggle">
-                  <span>Physical rating</span>
-                  <div className="rating-bars" aria-hidden="true">
-                    <span className="bar filled" />
-                    <span className="bar filled" />
-                    <span className="bar filled" />
-                    <span className="bar" />
-                    <span className="bar" />
+                <div className="filter-header filter-section-header">
+                  <div className={collapsed.deals ? 'collapsible closed' : 'collapsible'} onClick={() => toggleCollapse('deals')}>
+                    <span className="arrow">▾</span>
+                    <h3>Travel deals</h3>
+                  </div>
+                  <div>
+                    {(appliedFilters.onSale || appliedFilters.newTrips) ? (
+                      <button type="button" onClick={() => setAppliedFilters((c) => ({ ...c, onSale: false, newTrips: false }))}>Reset</button>
+                    ) : null}
                   </div>
                 </div>
+                {!collapsed.deals ? (
+                  <div className="filter-options">
+                    <label className="filter-option" onClick={() => setAppliedFilters((c) => ({ ...c, onSale: !c.onSale }))}>
+                      <span className={appliedFilters.onSale ? 'checkbox-square checked' : 'checkbox-square'} aria-hidden="true">{appliedFilters.onSale ? '✓' : ''}</span>
+                      <span className="filter-option-label">Trips on sale</span>
+                      <span className="count-badge">{getFacetCount('on_sale_aud', true) || ''}</span>
+                    </label>
+                    <label className="filter-option">
+                      <span className={false ? 'checkbox-square checked' : 'checkbox-square'} aria-hidden="true"></span>
+                      <span className="filter-option-label">Early bird</span>
+                    </label>
+                    <label className="filter-option">
+                      <span className={false ? 'checkbox-square checked' : 'checkbox-square'} aria-hidden="true"></span>
+                      <span className="filter-option-label">Last minute deals</span>
+                    </label>
+                    <label className="filter-option" onClick={() => setAppliedFilters((c) => ({ ...c, newTrips: !c.newTrips }))}>
+                      <span className={appliedFilters.newTrips ? 'checkbox-square checked' : 'checkbox-square'} aria-hidden="true">{appliedFilters.newTrips ? '✓' : ''}</span>
+                      <span className="filter-option-label">New trips</span>
+                    </label>
+                  </div>
+                ) : null}
               </div>
 
               <div className="filter-block">
-                <div className="filter-header">
-                  <h3>Themes</h3>
+                <div className="filter-header filter-section-header">
+                  <div className={collapsed.styles ? 'collapsible closed' : 'collapsible'} onClick={() => toggleCollapse('styles')}>
+                    <span className="arrow">▾</span>
+                    <h3>Styles</h3>
+                  </div>
+                  <div>
+                    {appliedFilters.styles.length > 0 ? (
+                      <button type="button" onClick={() => setAppliedFilters((c) => ({ ...c, styles: [] }))}>Reset</button>
+                    ) : null}
+                  </div>
                 </div>
-                <div className="filter-options">
-                  <label className="filter-option">
-                    <input type="checkbox" />
-                    <span className="filter-option-label">Wildlife</span>
-                  </label>
-                  <label className="filter-option">
-                    <input type="checkbox" />
-                    <span className="filter-option-label">Walking & hiking</span>
-                  </label>
-                  <label className="filter-option">
-                    <input type="checkbox" />
-                    <span className="filter-option-label">Family</span>
-                  </label>
+                {!collapsed.styles ? (
+                  <div className="filter-options">
+                    {['Basix','Original','Comfort','Premium'].map((option) => {
+                      const checked = appliedFilters.styles.includes(option)
+                      return (
+                        <label key={option} className="filter-option" onClick={() => setAppliedFilters((c) => ({ ...c, styles: c.styles.includes(option) ? c.styles.filter(x => x !== option) : [...c.styles, option] }))}>
+                          <span className={checked ? 'checkbox-square checked' : 'checkbox-square'} aria-hidden="true">{checked ? '✓' : ''}</span>
+                          <span className="filter-option-label">{option}</span>
+                          <span className="count-badge">{getFacetCount('styles', option) ?? 0}</span>
+                        </label>
+                      )
+                    })}
+                  </div>
+                ) : null}
+              </div>
+
+              <div className="filter-block">
+                <div className="filter-header filter-section-header">
+                  <div className={collapsed.physical ? 'collapsible closed' : 'collapsible'} onClick={() => toggleCollapse('physical')}>
+                    <span className="arrow">▾</span>
+                    <h3>Physical rating</h3>
+                  </div>
+                  <div>
+                    {appliedFilters.physicalRating.length > 0 ? (
+                      <button type="button" onClick={() => setAppliedFilters((c) => ({ ...c, physicalRating: [] }))}>Reset</button>
+                    ) : null}
+                  </div>
                 </div>
+                {!collapsed.physical ? (
+                  <div className="filter-options">
+                    {[1,2,3,4,5].map((n) => {
+                      const checked = appliedFilters.physicalRating.includes(n)
+                      return (
+                        <label key={n} className="filter-option" onClick={() => setAppliedFilters((c) => ({ ...c, physicalRating: c.physicalRating.includes(n) ? c.physicalRating.filter(x => x !== n) : [...c.physicalRating, n] }))}>
+                          <span className={checked ? 'checkbox-square checked' : 'checkbox-square'} aria-hidden="true">{checked ? '✓' : ''}</span>
+                          <span className="filter-option-label">{n} <span style={{color:'var(--ink-muted)', fontWeight:600}}>&nbsp;stars</span></span>
+                          <span className="count-badge">{getFacetCount('physicalRating', n) ?? 0}</span>
+                        </label>
+                      )
+                    })}
+                  </div>
+                ) : null}
+              </div>
+
+              <div className="filter-block">
+                <div className="filter-header filter-section-header">
+                  <div className={collapsed.themes ? 'collapsible closed' : 'collapsible'} onClick={() => toggleCollapse('themes')}>
+                    <span className="arrow">▾</span>
+                    <h3>Themes</h3>
+                  </div>
+                  <div>
+                    {appliedFilters.themes.length > 0 ? (
+                      <button type="button" onClick={() => setAppliedFilters((c) => ({ ...c, themes: [] }))}>Reset</button>
+                    ) : null}
+                  </div>
+                </div>
+                {!collapsed.themes ? (
+                  <div className="filter-options">
+                    {getFacetOptions(facetCounts, 'themes').map((opt) => {
+                      const checked = appliedFilters.themes.includes(opt.label)
+                      return (
+                        <label key={opt.label} className="filter-option" onClick={() => setAppliedFilters((c) => ({ ...c, themes: c.themes.includes(opt.label) ? c.themes.filter(x => x !== opt.label) : [...c.themes, opt.label] }))}>
+                          <span className={checked ? 'checkbox-square checked' : 'checkbox-square'} aria-hidden="true">{checked ? '✓' : ''}</span>
+                          <span className="filter-option-label">{opt.label}</span>
+                          <span className="count-badge">{opt.count ?? 0}</span>
+                        </label>
+                      )
+                    })}
+                  </div>
+                ) : null}
               </div>
 
               <button type="button" className="clear-all" onClick={clearFilters}>
