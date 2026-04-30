@@ -9,8 +9,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "create:collection": "node scripts/createCollection.js",
+    "recreate:collection": "node scripts/recreateCollection.js",
     "import:data": "node scripts/importData.js",
     "import:products": "node scripts/importProducts.js",
+    "export:data": "node scripts/exportData.js",
     "test:search": "node scripts/searchTest.js"
   },
   "repository": {
