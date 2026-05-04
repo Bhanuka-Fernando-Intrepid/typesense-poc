@@ -2,25 +2,9 @@ import { useEffect, useMemo, useState, useRef } from 'react'
 import { Link, Route, Routes, useParams } from 'react-router-dom'
 import Typesense from 'typesense'
 import './App.css'
+import { client, TYPESENSE_COLLECTION, TYPESENSE_READY } from './typesense/client'
+import { buildSearchQuery, getFacetOptions, buildFilterBy } from './typesense/helpers'
 
-const TYPESENSE_HOST = import.meta.env.VITE_TYPESENSE_HOST || "";
-const TYPESENSE_PORT = Number(import.meta.env.VITE_TYPESENSE_PORT) || 443;
-const TYPESENSE_PROTOCOL = import.meta.env.VITE_TYPESENSE_PROTOCOL || "https";
-const TYPESENSE_API_KEY = import.meta.env.VITE_TYPESENSE_SEARCH_API_KEY || import.meta.env.VITE_TYPESENSE_API_KEY || "";
-const TYPESENSE_COLLECTION = import.meta.env.VITE_TYPESENSE_COLLECTION || "dev_intrepid_departure";
-const TYPESENSE_READY = Boolean(TYPESENSE_HOST && TYPESENSE_API_KEY && TYPESENSE_COLLECTION);
-
-const client = new Typesense.Client({
-  nodes: [
-    {
-      host: TYPESENSE_HOST,
-      port: TYPESENSE_PORT,
-      protocol: TYPESENSE_PROTOCOL,
-    },
-  ],
-  apiKey: TYPESENSE_API_KEY,
-  connectionTimeoutSeconds: 2,
-});
 
 const ASSET_BASE_URL = import.meta.env.VITE_ASSET_BASE_URL || "https://www.intrepidtravel.com";
 
@@ -151,86 +135,7 @@ function getPrimaryValue(values, fallback = 'Unknown') {
   return fallback
 }
 
-function getFacetOptions(facetCounts, fieldName) {
-  const field = facetCounts.find((facet) => facet.field_name === fieldName)
-
-  if (!field || !Array.isArray(field.counts)) {
-    return []
-  }
-
-  return field.counts
-    .map((entry) => ({
-      label: String(entry.value),
-      count: entry.count,
-    }))
-    .filter((entry) => entry.label && entry.label !== 'null' && entry.label !== 'undefined')
-}
-
-function buildFilterBy(selectedFilters, selectedCurrency) {
-  const clauses = []
-
-  const escapeBackticks = (s) => String(s).replace(/`/g, "\\`")
-
-  if (Array.isArray(selectedFilters.marketingRegions) && selectedFilters.marketingRegions.length > 0) {
-    const vals = selectedFilters.marketingRegions.map((v) => `\`${escapeBackticks(v)}\``).join(',')
-    clauses.push(`marketingRegions:=[${vals}]`)
-  }
-
-  if (Array.isArray(selectedFilters.styles) && selectedFilters.styles.length > 0) {
-    const vals = selectedFilters.styles.map((v) => `\`${escapeBackticks(v)}\``).join(',')
-    clauses.push(`styles:=[${vals}]`)
-  }
-
-  if (Array.isArray(selectedFilters.themes) && selectedFilters.themes.length > 0) {
-    const vals = selectedFilters.themes.map((v) => `\`${escapeBackticks(v)}\``).join(',')
-    clauses.push(`themes:=[${vals}]`)
-  }
-
-  if (Array.isArray(selectedFilters.physicalRating) && selectedFilters.physicalRating.length > 0) {
-    const vals = selectedFilters.physicalRating.map((v) => `\`${escapeBackticks(String(v))}\``).join(',')
-    clauses.push(`physicalRating:=[${vals}]`)
-  }
-
-  if (selectedFilters.durationMin) clauses.push(`duration:>=${selectedFilters.durationMin}`)
-  if (selectedFilters.durationMax) clauses.push(`duration:<=${selectedFilters.durationMax}`)
-  if (selectedFilters.priceMin) clauses.push(`lowestPrice.${selectedCurrency}.price:>=${selectedFilters.priceMin}`)
-  if (selectedFilters.priceMax) clauses.push(`lowestPrice.${selectedCurrency}.price:<=${selectedFilters.priceMax}`)
-
-  if (selectedFilters.startDate) {
-    // selectedFilters.startDate expected as yyyy-mm-dd from the date input; convert to epoch seconds used in index
-    const ts = Math.floor(new Date(selectedFilters.startDate).getTime() / 1000)
-    if (!Number.isNaN(ts)) clauses.push(`startDate:>=${ts}`)
-  }
-
-  if (selectedFilters.onSale) clauses.push(`lowestPrice.${selectedCurrency}.onSale:=true`)
-  if (selectedFilters.newTrips) clauses.push(`isNew:=true`)
-
-  return clauses.join(' && ')
-}
-
-function buildSearchQuery(query, sortBy, filters, selectedCurrency) {
-  const searchQuery = query.trim() ? query.trim() : '*'
-  const filterBy = buildFilterBy(filters, selectedCurrency)
-
-  const searchParameters = {
-    q: searchQuery,
-    query_by: SEARCH_FIELDS,
-    max_facet_values: 50,
-    per_page: 250,
-    sort_by: sortBy,
-  }
-
-  // Note: facet_by disabled if fields are not marked as facets in schema
-  // if (FACET_FIELDS) {
-  //   searchParameters.facet_by = FACET_FIELDS
-  // }
-
-  if (filterBy) {
-    searchParameters.filter_by = filterBy
-  }
-
-  return searchParameters
-}
+// Typesense helpers moved to ./typesense/helpers.js
 
 function FilterOption({ label, count, active, onClick }) {
   return (
@@ -265,10 +170,12 @@ function ProductSearchPage({ selectedCurrency }) {
     priceMin: '',
     priceMax: '',
     startDate: '',
+    endDate: '',
     onSale: false,
     newTrips: false,
   })
-  const [showDatePicker, setShowDatePicker] = useState(false)
+  const [showStartDatePicker, setShowStartDatePicker] = useState(false)
+  const [showEndDatePicker, setShowEndDatePicker] = useState(false)
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
   const [pendingDestinations, setPendingDestinations] = useState([])
   const [products, setProducts] = useState([])
@@ -472,6 +379,13 @@ function ProductSearchPage({ selectedCurrency }) {
           prefix: true,
         }
 
+        // Suggestions: allow a small amount of typo tolerance based on query length
+        const qlen = query.trim().length
+        let sugNumTypos = 0
+        if (qlen >= 5) sugNumTypos = 2
+        else if (qlen >= 3) sugNumTypos = 1
+        params.num_typos = sugNumTypos
+
         const res = await client.collections(TYPESENSE_COLLECTION).documents().search(params)
         if (!isActive) return
 
@@ -581,6 +495,7 @@ function ProductSearchPage({ selectedCurrency }) {
       priceMin: '',
       priceMax: '',
       startDate: '',
+      endDate: '',
       onSale: false,
       newTrips: false,
     })
@@ -598,6 +513,7 @@ function ProductSearchPage({ selectedCurrency }) {
     const durationMin = params.get('durationMin') || ''
     const durationMax = params.get('durationMax') || ''
     const startDate = params.get('startDate') || ''
+    const endDate = params.get('endDate') || ''
     const sort = params.get('sort') || sortBy
 
     if (q) setQuery(q)
@@ -611,6 +527,7 @@ function ProductSearchPage({ selectedCurrency }) {
       durationMin,
       durationMax,
       startDate,
+      endDate,
     }))
     if (regions) setPendingDestinations(regions.split(',').filter(Boolean))
   }, [])
@@ -626,6 +543,7 @@ function ProductSearchPage({ selectedCurrency }) {
     if (appliedFilters.durationMin) params.set('durationMin', appliedFilters.durationMin)
     if (appliedFilters.durationMax) params.set('durationMax', appliedFilters.durationMax)
     if (appliedFilters.startDate) params.set('startDate', appliedFilters.startDate)
+    if (appliedFilters.endDate) params.set('endDate', appliedFilters.endDate)
     if (sortBy) params.set('sort', sortBy)
     const newUrl = `${window.location.pathname}?${params.toString()}`
     window.history.replaceState({}, '', newUrl)
@@ -750,26 +668,51 @@ function ProductSearchPage({ selectedCurrency }) {
             Filters
           </button>
 
-          <div className="search-dates" onClick={() => setShowDatePicker((s) => !s)} role="button" tabIndex={0} aria-label="Start date">
-            <span className="calendar-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24">
-                <path d="M7 2h2v2h6V2h2v2h3v18H4V4h3V2zm12 8H5v9h14v-9z" fill="currentColor" />
-              </svg>
-            </span>
-            <div className="start-date-label">{appliedFilters.startDate ? new Date(appliedFilters.startDate).toLocaleDateString() : 'Start date'}</div>
-            {showDatePicker ? (
-              <input
-                type="date"
-                className="start-date-picker"
-                value={appliedFilters.startDate || ''}
-                onChange={(e) => {
-                  const v = e.target.value
-                  setAppliedFilters((c) => ({ ...c, startDate: v }))
-                  setShowDatePicker(false)
-                }}
-              />
-            ) : null}
-          </div>
+                  <div className="search-dates">
+                    <div className="date-control" role="button" tabIndex={0} onClick={() => setShowStartDatePicker((s) => !s)}>
+                      <span className="calendar-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24">
+                          <path d="M7 2h2v2h6V2h2v2h3v18H4V4h3V2zm12 8H5v9h14v-9z" fill="currentColor" />
+                        </svg>
+                      </span>
+                      <div className="start-date-label">{appliedFilters.startDate ? new Date(appliedFilters.startDate).toLocaleDateString() : 'Start date'}</div>
+                      {showStartDatePicker ? (
+                        <input
+                          type="date"
+                          className="start-date-picker"
+                          value={appliedFilters.startDate || ''}
+                          onChange={(e) => {
+                            const v = e.target.value
+                            setAppliedFilters((c) => ({ ...c, startDate: v }))
+                            setShowStartDatePicker(false)
+                          }}
+                        />
+                      ) : null}
+                    </div>
+
+                    <div style={{ width: 12 }} />
+
+                    <div className="date-control" role="button" tabIndex={0} onClick={() => setShowEndDatePicker((s) => !s)}>
+                      <span className="calendar-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24">
+                          <path d="M7 2h2v2h6V2h2v2h3v18H4V4h3V2zm12 8H5v9h14v-9z" fill="currentColor" />
+                        </svg>
+                      </span>
+                      <div className="end-date-label">{appliedFilters.endDate ? new Date(appliedFilters.endDate).toLocaleDateString() : 'End date'}</div>
+                      {showEndDatePicker ? (
+                        <input
+                          type="date"
+                          className="end-date-picker"
+                          value={appliedFilters.endDate || ''}
+                          onChange={(e) => {
+                            const v = e.target.value
+                            setAppliedFilters((c) => ({ ...c, endDate: v }))
+                            setShowEndDatePicker(false)
+                          }}
+                        />
+                      ) : null}
+                    </div>
+                  </div>
 
           <button type="button" className="search-button" onClick={() => { /* visual-only, main search reacts to query */ }}>
             <span>Search</span>
@@ -831,8 +774,8 @@ function ProductSearchPage({ selectedCurrency }) {
 
         {appliedFilters.startDate ? (
           <div key={`chip-date`} className="chip">
-            <span>{new Date(appliedFilters.startDate).toLocaleDateString()}</span>
-            <button onClick={() => setAppliedFilters((c) => ({ ...c, startDate: '' }))}>×</button>
+            <span>{appliedFilters.startDate && appliedFilters.endDate ? `${new Date(appliedFilters.startDate).toLocaleDateString()} — ${new Date(appliedFilters.endDate).toLocaleDateString()}` : new Date(appliedFilters.startDate).toLocaleDateString()}</span>
+            <button onClick={() => setAppliedFilters((c) => ({ ...c, startDate: '', endDate: '' }))}>×</button>
           </div>
         ) : null}
 
