@@ -215,6 +215,55 @@ button {
   margin-right: 6px;
 }
 
+.curation-banner {
+  margin: 18px 0 24px;
+  padding: 18px 22px;
+  border-radius: 18px;
+  border: 1px solid #ffd6a8;
+  background: #fff7ed;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.curation-banner-label {
+  display: inline-block;
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #d35400;
+}
+
+.curation-banner h3 {
+  margin: 0 0 6px;
+  font-size: 22px;
+  font-weight: 800;
+  color: #111;
+}
+
+.curation-banner p {
+  margin: 0;
+  font-size: 15px;
+  color: #555;
+}
+
+.curation-banner-close {
+  border: none;
+  background: transparent;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  color: #555;
+}
+
+.curation-banner-close:hover {
+  color: #111;
+}
+
 .search-pill {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto auto auto;

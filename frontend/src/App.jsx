@@ -184,6 +184,7 @@ function ProductSearchPage({ selectedCurrency }) {
   const [totalFound, setTotalFound] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
+  const [curationMetadata, setCurationMetadata] = useState(null)
 
   const adjustedSortBy = useMemo(() => {
     switch (sortBy) {
@@ -296,6 +297,7 @@ function ProductSearchPage({ selectedCurrency }) {
         setProducts([])
         setTotalFound(0)
         setFacetCounts([])
+        setCurationMetadata(null)
         setIsLoading(false)
         return
       }
@@ -316,9 +318,18 @@ function ProductSearchPage({ selectedCurrency }) {
             page: 1,
           })
 
+        console.log('Typesense search result:', response)
+
         if (!isActive) {
           return
         }
+
+        const metadata =
+          response.metadata ??
+          response.curated_metadata ??
+          response.curation_metadata ??
+          response.search_cutoff_metadata
+        setCurationMetadata(metadata || null)
 
         const firstHits = Array.isArray(response.hits) ? response.hits : []
         const found = Number(response.found ?? firstHits.length)
@@ -377,6 +388,7 @@ function ProductSearchPage({ selectedCurrency }) {
         setProducts([])
         setTotalFound(0)
         setFacetCounts([])
+        setCurationMetadata(null)
       } finally {
         if (isActive) {
           setIsLoading(false)
@@ -818,6 +830,30 @@ function ProductSearchPage({ selectedCurrency }) {
           <button className="clear-all" onClick={clearFilters}>Clear all filters</button>
         ) : null}
       </div>
+
+      {curationMetadata ? (
+        <div className="curation-banner">
+          <div>
+            <span className="curation-banner-label">
+              {curationMetadata.campaign || 'Featured campaign'}
+            </span>
+            <h3>{curationMetadata.banner_title || 'Featured search'}</h3>
+            <p>
+              {curationMetadata.banner_title
+                ? curationMetadata.banner_message
+                : JSON.stringify(curationMetadata)}
+            </p>
+          </div>
+          <button
+            type="button"
+            className="curation-banner-close"
+            onClick={() => setCurationMetadata(null)}
+            aria-label="Close promotion banner"
+          >
+            ×
+          </button>
+        </div>
+      ) : null}
 
       <section className="results" id="results" aria-live="polite">
         <div className="results-toolbar">
