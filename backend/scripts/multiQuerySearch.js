@@ -4,6 +4,7 @@ async function runMultiSearchTests() {
   try {
     console.log("\n=== Multi Search Test (Federated Search) ===");
 
+    const start = Date.now();
     const response = await client.multiSearch.perform({
       searches: [
         {
@@ -23,6 +24,8 @@ async function runMultiSearchTests() {
         },
       ],
     });
+    const end = Date.now();
+    const totalTime = end - start;
 
     console.log("\n--- Query 1: 'bolivia' (dev collection) ---");
     console.log("Total Found:", response.results[0].found);
@@ -32,6 +35,8 @@ async function runMultiSearchTests() {
 
     console.log("\n--- Query 3: 'north india' (dev collection) ---");
     console.log("Total Found:", response.results[2].found);
+
+    console.log("\nTotal Multi-Search Time:", totalTime, "ms");
   } catch (err) {
     console.error("Multi Search error:", err);
   }
