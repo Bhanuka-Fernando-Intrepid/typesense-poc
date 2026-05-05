@@ -159,6 +159,7 @@ function ProductSearchPage({ selectedCurrency }) {
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1)
   const searchContainerRef = useRef(null)
   const [sortBy, setSortBy] = useState(SORT_OPTIONS[0].value)
+  const SEARCH_PAGE_SIZE = 250
   // appliedFilters are sent to Typesense; pendingDestinations used for Apply behavior
   const [appliedFilters, setAppliedFilters] = useState({
     marketingRegions: [],
@@ -300,22 +301,56 @@ function ProductSearchPage({ selectedCurrency }) {
       }
 
       try {
+        const baseParams = {
+          ...buildSearchQuery(query, adjustedSortBy, appliedFilters, selectedCurrency),
+          facet_by: 'marketingRegions,styles,themes,physicalRating,productId',
+          max_facet_values: 2000,
+          per_page: SEARCH_PAGE_SIZE,
+        }
+
         const response = await client
           .collections(TYPESENSE_COLLECTION)
           .documents()
           .search({
-            ...buildSearchQuery(query, adjustedSortBy, appliedFilters, selectedCurrency),
-            facet_by: 'marketingRegions,styles,themes,physicalRating,productId',
-            max_facet_values: 2000,
+            ...baseParams,
+            page: 1,
           })
 
         if (!isActive) {
           return
         }
 
-        const documents = Array.isArray(response.hits)
-          ? response.hits.map((hit) => hit.document)
-          : []
+        const firstHits = Array.isArray(response.hits) ? response.hits : []
+        const found = Number(response.found ?? firstHits.length)
+        const totalPages = Math.ceil(found / SEARCH_PAGE_SIZE)
+        let allHits = firstHits
+
+        if (totalPages > 1) {
+          const pageRequests = []
+          for (let page = 2; page <= totalPages; page += 1) {
+            pageRequests.push(
+              client
+                .collections(TYPESENSE_COLLECTION)
+                .documents()
+                .search({
+                  ...baseParams,
+                  page,
+                }),
+            )
+          }
+
+          const pageResponses = await Promise.all(pageRequests)
+          if (!isActive) {
+            return
+          }
+
+          const extraHits = pageResponses.flatMap((pageResponse) =>
+            Array.isArray(pageResponse.hits) ? pageResponse.hits : [],
+          )
+          allHits = firstHits.concat(extraHits)
+        }
+
+        const documents = allHits.map((hit) => hit.document)
         const groupedMap = new Map()
         documents.forEach((doc) => {
           const key = doc.productId ?? doc.id

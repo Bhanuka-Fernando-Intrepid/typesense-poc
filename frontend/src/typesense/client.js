@@ -16,7 +16,7 @@ const client = new Typesense.Client({
     },
   ],
   apiKey: TYPESENSE_API_KEY,
-  connectionTimeoutSeconds: 2,
+  connectionTimeoutSeconds: 10,
 });
 
 export { client, TYPESENSE_COLLECTION, TYPESENSE_READY }
