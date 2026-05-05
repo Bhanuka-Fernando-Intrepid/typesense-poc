@@ -300,7 +300,7 @@
             "type": "string"
         },
         {
-            "facet": false,
+            "facet": true,
             "index": true,
             "infix": false,
             "locale": "",
