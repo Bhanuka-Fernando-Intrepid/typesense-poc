@@ -1,26 +1,10 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, useRef } from 'react'
 import { Link, Route, Routes, useParams } from 'react-router-dom'
 import Typesense from 'typesense'
 import './App.css'
+import { client, TYPESENSE_COLLECTION, TYPESENSE_READY } from './typesense/client'
+import { buildSearchQuery, getFacetOptions, buildFilterBy } from './typesense/helpers'
 
-const TYPESENSE_HOST = import.meta.env.VITE_TYPESENSE_HOST || "";
-const TYPESENSE_PORT = Number(import.meta.env.VITE_TYPESENSE_PORT) || 443;
-const TYPESENSE_PROTOCOL = import.meta.env.VITE_TYPESENSE_PROTOCOL || "https";
-const TYPESENSE_API_KEY = import.meta.env.VITE_TYPESENSE_API_KEY || "";
-const TYPESENSE_COLLECTION = import.meta.env.VITE_TYPESENSE_COLLECTION || "dev_intrepid_departure";
-const TYPESENSE_READY = Boolean(TYPESENSE_HOST && TYPESENSE_API_KEY && TYPESENSE_COLLECTION);
-
-const client = new Typesense.Client({
-  nodes: [
-    {
-      host: TYPESENSE_HOST,
-      port: TYPESENSE_PORT,
-      protocol: TYPESENSE_PROTOCOL,
-    },
-  ],
-  apiKey: TYPESENSE_API_KEY,
-  connectionTimeoutSeconds: 2,
-});
 
 const ASSET_BASE_URL = import.meta.env.VITE_ASSET_BASE_URL || "https://www.intrepidtravel.com";
 
@@ -52,28 +36,25 @@ const REGION_CONFIG = [
 ]
 
 const SORT_OPTIONS = [
-  {
-    label: 'Relevance',
-    value: '_text_match:desc',
-  },
-  {
-    label: 'Price (low to high)',
-    value: 'price_usd:asc',
-  },
-  {
-    label: 'Price (high to low)',
-    value: 'price_usd:desc',
-  },
-  {
-    label: 'Duration (short to long)',
-    value: 'duration:asc',
-  },
+  { label: 'Relevance', value: 'relevance' },
+  { label: 'Price (low to high)', value: 'price_asc' },
+  { label: 'Price (high to low)', value: 'price_desc' },
+  { label: 'Duration (short to long)', value: 'duration_asc' },
+  { label: 'Duration (long to short)', value: 'duration_desc' },
+  { label: 'Rating', value: 'rating_desc' },
+  { label: 'Soonest departure', value: 'startDate_asc' },
 ]
 
 const SEARCH_FIELDS =
-  'name,primaryCountry,destinations,marketingRegions,styles,locations,startCity,endCity,themes'
+  'name,primaryCountry,destinations,locations,marketingRegions,themes,styles'
 
 const FACET_FIELDS = 'marketingRegions,styles'
+
+// UI -> stored value mapping for styles/themes where display differs from stored data
+const STYLE_UI_TO_VALUE = {
+  Basix: 'Basic',
+}
+const STYLE_VALUE_TO_UI = Object.fromEntries(Object.entries(STYLE_UI_TO_VALUE).map(([k,v]) => [v,k]))
 
 const DEFAULT_FILTERS = {
   marketingRegion: 'all',
@@ -140,6 +121,7 @@ function getLowestPrice(lowestPrice, currencyCode = 'usd') {
 
   return {
     price: price,
+    originalPrice: priceData.price,
     currency: priceData.currencyCode || currencyCode.toUpperCase(),
     onSale: priceData.onSale ?? false,
   }
@@ -153,89 +135,7 @@ function getPrimaryValue(values, fallback = 'Unknown') {
   return fallback
 }
 
-function getFacetOptions(facetCounts, fieldName) {
-  const field = facetCounts.find((facet) => facet.field_name === fieldName)
-
-  if (!field || !Array.isArray(field.counts)) {
-    return []
-  }
-
-  return field.counts
-    .map((entry) => ({
-      label: String(entry.value),
-      count: entry.count,
-    }))
-    .filter((entry) => entry.label && entry.label !== 'null' && entry.label !== 'undefined')
-}
-
-function buildFilterBy(filters, selectedCurrency) {
-  const clauses = []
-
-  if (filters.marketingRegion !== 'all') {
-    clauses.push(`marketingRegions:=${filters.marketingRegion}`)
-  }
-
-  if (filters.style !== 'all') {
-    clauses.push(`styles:=${filters.style}`)
-  }
-
-  if (filters.availability === 'available') {
-    clauses.push('hasPlacesLeft:=true && closedForBooking:=false')
-  }
-
-  if (filters.availability === 'sold-out') {
-    clauses.push('hasPlacesLeft:=false || closedForBooking:=true')
-  }
-
-  if (filters.durationMin) {
-    clauses.push(`duration:>=${filters.durationMin}`)
-  }
-
-  if (filters.durationMax) {
-    clauses.push(`duration:<=${filters.durationMax}`)
-  }
-
-  if (filters.priceMin) {
-    const priceField = `lowestPrice.${selectedCurrency}.price`
-    clauses.push(`${priceField}:>=${filters.priceMin}`)
-  }
-
-  if (filters.priceMax) {
-    const priceField = `lowestPrice.${selectedCurrency}.price`
-    clauses.push(`${priceField}:<=${filters.priceMax}`)
-  }
-
-  if (filters.onSale) {
-    const onSaleField = `lowestPrice.${selectedCurrency}.onSale`
-    clauses.push(`${onSaleField}:=true`)
-  }
-
-  return clauses.join(' && ')
-}
-
-function buildSearchQuery(query, sortBy, filters, selectedCurrency) {
-  const searchQuery = query.trim() ? query.trim() : '*'
-  const filterBy = buildFilterBy(filters, selectedCurrency)
-
-  const searchParameters = {
-    q: searchQuery,
-    query_by: SEARCH_FIELDS,
-    max_facet_values: 50,
-    per_page: 250,
-    sort_by: sortBy,
-  }
-
-  // Note: facet_by disabled if fields are not marked as facets in schema
-  // if (FACET_FIELDS) {
-  //   searchParameters.facet_by = FACET_FIELDS
-  // }
-
-  if (filterBy) {
-    searchParameters.filter_by = filterBy
-  }
-
-  return searchParameters
-}
+// Typesense helpers moved to ./typesense/helpers.js
 
 function FilterOption({ label, count, active, onClick }) {
   return (
@@ -254,8 +154,31 @@ function FilterOption({ label, count, active, onClick }) {
 
 function ProductSearchPage({ selectedCurrency }) {
   const [query, setQuery] = useState('')
+  const [suggestions, setSuggestions] = useState([])
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1)
+  const searchContainerRef = useRef(null)
   const [sortBy, setSortBy] = useState(SORT_OPTIONS[0].value)
-  const [filters, setFilters] = useState(DEFAULT_FILTERS)
+  const SEARCH_PAGE_SIZE = 250
+  // appliedFilters are sent to Typesense; pendingDestinations used for Apply behavior
+  const [appliedFilters, setAppliedFilters] = useState({
+    marketingRegions: [],
+    styles: [],
+    themes: [],
+    physicalRating: [],
+    durationMin: '',
+    durationMax: '',
+    priceMin: '',
+    priceMax: '',
+    startDate: '',
+    endDate: '',
+    onSale: false,
+    newTrips: false,
+  })
+  const [showStartDatePicker, setShowStartDatePicker] = useState(false)
+  const [showEndDatePicker, setShowEndDatePicker] = useState(false)
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
+  const [pendingDestinations, setPendingDestinations] = useState([])
   const [products, setProducts] = useState([])
   const [facetCounts, setFacetCounts] = useState([])
   const [totalFound, setTotalFound] = useState(0)
@@ -263,61 +186,103 @@ function ProductSearchPage({ selectedCurrency }) {
   const [error, setError] = useState('')
 
   const adjustedSortBy = useMemo(() => {
-    if (!sortBy.includes('price')) {
-      return sortBy
+    switch (sortBy) {
+      case 'relevance':
+        return '_text_match:desc'
+      case 'price_asc':
+        return `lowestPrice.${selectedCurrency}.price:asc`
+      case 'price_desc':
+        return `lowestPrice.${selectedCurrency}.price:desc`
+      case 'duration_asc':
+        return 'duration:asc'
+      case 'duration_desc':
+        return 'duration:desc'
+      case 'rating_desc':
+        return 'reviewRating:desc'
+      case 'startDate_asc':
+        return 'startDate:asc'
+      default:
+        return '_text_match:desc'
     }
-    // Convert price sort to use nested lowestPrice field
-    // e.g., 'price_usd:asc' becomes 'lowestPrice.usd.price:asc'
-    const direction = sortBy.includes(':asc') ? ':asc' : ':desc'
-    const currencyField = `lowestPrice.${selectedCurrency}.price`
-    return `${currencyField}${direction}`
   }, [sortBy, selectedCurrency])
 
-  const marketingRegionOptions = useMemo(
-    () => {
-      // If facets are available, use them
-      const facetData = getFacetOptions(facetCounts, 'marketingRegions')
-      if (facetData.length > 0) {
-        return facetData
+  const marketingRegionOptions = useMemo(() => {
+    // Compute counts from unique products so facet counts reflect product counts
+    const regionMap = new Map()
+    products.forEach((product) => {
+      if (Array.isArray(product.marketingRegions)) {
+        // count each product once per region
+        const unique = Array.from(new Set(product.marketingRegions))
+        unique.forEach((region) => {
+          regionMap.set(region, (regionMap.get(region) || 0) + 1)
+        })
       }
-      
-      // Otherwise, generate from product data
-      const regionMap = new Map()
-      products.forEach((product) => {
-        if (Array.isArray(product.marketingRegions)) {
-          product.marketingRegions.forEach((region) => {
-            regionMap.set(region, (regionMap.get(region) || 0) + 1)
-          })
-        }
-      })
-      
-      return Array.from(regionMap).map(([label, count]) => ({ label, count }))
-    },
-    [facetCounts, products],
-  )
+    })
 
-  const styleOptions = useMemo(
-    () => {
-      // If facets are available, use them
-      const facetData = getFacetOptions(facetCounts, 'styles')
-      if (facetData.length > 0) {
-        return facetData
+    // Ensure selected applied and pending values remain visible
+    ;[...appliedFilters.marketingRegions, ...pendingDestinations].forEach((v) => {
+      if (v && !regionMap.has(v)) regionMap.set(v, 0)
+    })
+
+    return Array.from(regionMap).map(([label, count]) => ({ label, count }))
+  }, [facetCounts, products, appliedFilters.marketingRegions, pendingDestinations])
+
+  const styleOptions = useMemo(() => {
+    // Compute counts from unique products and normalize UI labels
+    const styleMap = new Map()
+    products.forEach((product) => {
+      if (Array.isArray(product.styles)) {
+        const unique = Array.from(new Set(product.styles))
+        unique.forEach((styleVal) => {
+          // normalize stored value to UI label if needed
+          const uiLabel = STYLE_VALUE_TO_UI[styleVal] || styleVal
+          styleMap.set(uiLabel, (styleMap.get(uiLabel) || 0) + 1)
+        })
       }
-      
-      // Otherwise, generate from product data
-      const styleMap = new Map()
-      products.forEach((product) => {
-        if (Array.isArray(product.styles)) {
-          product.styles.forEach((style) => {
-            styleMap.set(style, (styleMap.get(style) || 0) + 1)
-          })
-        }
-      })
-      
-      return Array.from(styleMap).map(([label, count]) => ({ label, count }))
-    },
-    [facetCounts, products],
-  )
+    })
+
+    // Ensure selected visible (appliedFilters stores stored-values)
+    appliedFilters.styles.forEach((storedVal) => {
+      const uiLabel = STYLE_VALUE_TO_UI[storedVal] || storedVal
+      if (uiLabel && !styleMap.has(uiLabel)) styleMap.set(uiLabel, 0)
+    })
+
+    return Array.from(styleMap).map(([label, count]) => ({ label, count }))
+  }, [facetCounts, products, appliedFilters.styles])
+
+  const themeOptions = useMemo(() => {
+    const map = new Map()
+    products.forEach((product) => {
+      if (Array.isArray(product.themes)) {
+        const unique = Array.from(new Set(product.themes))
+        unique.forEach((t) => map.set(t, (map.get(t) || 0) + 1))
+      }
+    })
+    appliedFilters.themes.forEach((v) => { if (v && !map.has(v)) map.set(v, 0) })
+    return Array.from(map).map(([label, count]) => ({ label, count }))
+  }, [products, appliedFilters.themes])
+
+  const physicalCounts = useMemo(() => {
+    const map = new Map()
+    products.forEach((product) => {
+      const val = product.physicalRating
+      if (val !== undefined && val !== null) {
+        map.set(val, (map.get(val) || 0) + 1)
+      }
+    })
+    return map
+  }, [products])
+
+  const onSaleCount = useMemo(() => {
+    let c = 0
+    products.forEach((product) => {
+      const lp = product.lowestPrice
+      if (!lp) return
+      const pData = (lp && lp[selectedCurrency]) || lp.usd || Object.values(lp)[0]
+      if (pData && pData.onSale) c += 1
+    })
+    return c
+  }, [products, selectedCurrency])
 
   useEffect(() => {
     let isActive = true
@@ -336,18 +301,56 @@ function ProductSearchPage({ selectedCurrency }) {
       }
 
       try {
+        const baseParams = {
+          ...buildSearchQuery(query, adjustedSortBy, appliedFilters, selectedCurrency),
+          facet_by: 'marketingRegions,styles,themes,physicalRating,productId',
+          max_facet_values: 2000,
+          per_page: SEARCH_PAGE_SIZE,
+        }
+
         const response = await client
           .collections(TYPESENSE_COLLECTION)
           .documents()
-          .search(buildSearchQuery(query, adjustedSortBy, filters, selectedCurrency))
+          .search({
+            ...baseParams,
+            page: 1,
+          })
 
         if (!isActive) {
           return
         }
 
-        const documents = Array.isArray(response.hits)
-          ? response.hits.map((hit) => hit.document)
-          : []
+        const firstHits = Array.isArray(response.hits) ? response.hits : []
+        const found = Number(response.found ?? firstHits.length)
+        const totalPages = Math.ceil(found / SEARCH_PAGE_SIZE)
+        let allHits = firstHits
+
+        if (totalPages > 1) {
+          const pageRequests = []
+          for (let page = 2; page <= totalPages; page += 1) {
+            pageRequests.push(
+              client
+                .collections(TYPESENSE_COLLECTION)
+                .documents()
+                .search({
+                  ...baseParams,
+                  page,
+                }),
+            )
+          }
+
+          const pageResponses = await Promise.all(pageRequests)
+          if (!isActive) {
+            return
+          }
+
+          const extraHits = pageResponses.flatMap((pageResponse) =>
+            Array.isArray(pageResponse.hits) ? pageResponse.hits : [],
+          )
+          allHits = firstHits.concat(extraHits)
+        }
+
+        const documents = allHits.map((hit) => hit.document)
         const groupedMap = new Map()
         documents.forEach((doc) => {
           const key = doc.productId ?? doc.id
@@ -358,7 +361,10 @@ function ProductSearchPage({ selectedCurrency }) {
         const groupedDocuments = Array.from(groupedMap.values())
 
         setProducts(groupedDocuments)
-        setTotalFound(groupedDocuments.length)
+        // Prefer productId facet counts (unique products) if present, otherwise fallback
+        const productFacet = (response.facet_counts || []).find((f) => f.field_name === 'productId')
+        const uniqueProducts = productFacet && Array.isArray(productFacet.counts) ? productFacet.counts.length : groupedDocuments.length
+        setTotalFound(uniqueProducts)
         setFacetCounts(response.facet_counts ?? [])
       } catch (searchError) {
         if (!isActive) {
@@ -380,19 +386,248 @@ function ProductSearchPage({ selectedCurrency }) {
 
     const timer = window.setTimeout(() => {
       runSearch()
-    }, 200)
+    }, 300)
 
     return () => {
       isActive = false
       window.clearTimeout(timer)
     }
-  }, [query, adjustedSortBy, filters, selectedCurrency])
+  }, [query, adjustedSortBy, appliedFilters, selectedCurrency])
+
+  // Suggestions fetching (debounced shorter than main search)
+  useEffect(() => {
+    if (!query || query.trim().length < 2 || !TYPESENSE_READY) {
+      setSuggestions([])
+      setShowSuggestions(false)
+      return
+    }
+
+    let isActive = true
+    const fetchSuggestions = async () => {
+      try {
+        const params = {
+          q: query.trim(),
+          query_by: 'primaryCountry,destinations,locations,regions,name',
+          query_by_weights: '5,4,3,2,1',
+          per_page: 8,
+          include_fields: 'name,primaryCountry,destinations,locations,regions',
+          prefix: true,
+        }
+
+        // Suggestions: allow a small amount of typo tolerance based on query length
+        const qlen = query.trim().length
+        let sugNumTypos = 0
+        if (qlen >= 5) sugNumTypos = 2
+        else if (qlen >= 3) sugNumTypos = 1
+        params.num_typos = sugNumTypos
+
+        const res = await client.collections(TYPESENSE_COLLECTION).documents().search(params)
+        if (!isActive) return
+
+        const hits = Array.isArray(res.hits) ? res.hits.map((h) => h.document) : []
+        const qLower = query.trim().toLowerCase()
+        const items = []
+        const seen = new Set()
+
+        const pushIf = (str) => {
+          if (!str) return
+          const s = String(str).trim()
+          const key = s.toLowerCase()
+          if (!key || seen.has(key)) return
+          if (qLower && key.indexOf(qLower) === -1) return
+          seen.add(key)
+          items.push(s)
+        }
+
+        // Priority: primaryCountry -> destinations -> locations -> regions -> name
+        for (const doc of hits) {
+          if (items.length >= 5) break
+          pushIf(doc.primaryCountry)
+        }
+
+        if (items.length < 5) {
+          for (const doc of hits) {
+            if (items.length >= 5) break
+            if (Array.isArray(doc.destinations)) {
+              for (const d of doc.destinations) {
+                pushIf(d)
+                if (items.length >= 5) break
+              }
+            }
+          }
+        }
+
+        if (items.length < 5) {
+          for (const doc of hits) {
+            if (items.length >= 5) break
+            if (Array.isArray(doc.locations)) {
+              for (const l of doc.locations) {
+                pushIf(l)
+                if (items.length >= 5) break
+              }
+            }
+          }
+        }
+
+        if (items.length < 5) {
+          for (const doc of hits) {
+            if (items.length >= 5) break
+            if (Array.isArray(doc.regions)) {
+              for (const r of doc.regions) {
+                pushIf(r)
+                if (items.length >= 5) break
+              }
+            }
+          }
+        }
+
+        // Trip names: avoid short/common-word matches. Only include if query length >=3
+        if (qLower.length >= 3 && items.length < 5) {
+          for (const doc of hits) {
+            if (items.length >= 5) break
+            pushIf(doc.name)
+          }
+        }
+
+        setSuggestions(items.slice(0, 5))
+        setShowSuggestions(items.length > 0)
+        setSelectedSuggestionIndex(-1)
+      } catch (err) {
+        console.error('Suggestion fetch error', err)
+        setSuggestions([])
+        setShowSuggestions(false)
+      }
+    }
+
+    const t = window.setTimeout(() => fetchSuggestions(), 300)
+
+    return () => {
+      isActive = false
+      window.clearTimeout(t)
+    }
+  }, [query])
+
+  // Click outside to close suggestions
+  useEffect(() => {
+    const onDocClick = (e) => {
+      if (!searchContainerRef.current) return
+      if (!searchContainerRef.current.contains(e.target)) {
+        setShowSuggestions(false)
+      }
+    }
+    document.addEventListener('mousedown', onDocClick)
+    return () => document.removeEventListener('mousedown', onDocClick)
+  }, [])
 
   const clearFilters = () => {
-    setFilters(DEFAULT_FILTERS)
+    setAppliedFilters({
+      marketingRegions: [],
+      styles: [],
+      themes: [],
+      physicalRating: [],
+      durationMin: '',
+      durationMax: '',
+      priceMin: '',
+      priceMax: '',
+      startDate: '',
+      endDate: '',
+      onSale: false,
+      newTrips: false,
+    })
+    setPendingDestinations([])
+  }
+
+  // Restore state from URL on mount
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const q = params.get('q') || ''
+    const regions = params.get('regions')
+    const styles = params.get('styles')
+    const themes = params.get('themes')
+    const physical = params.get('physical')
+    const durationMin = params.get('durationMin') || ''
+    const durationMax = params.get('durationMax') || ''
+    const startDate = params.get('startDate') || ''
+    const endDate = params.get('endDate') || ''
+    const sort = params.get('sort') || sortBy
+
+    if (q) setQuery(q)
+    setSortBy(sort)
+    setAppliedFilters((c) => ({
+      ...c,
+      marketingRegions: regions ? regions.split(',').filter(Boolean) : c.marketingRegions,
+      styles: styles ? styles.split(',').filter(Boolean) : c.styles,
+      themes: themes ? themes.split(',').filter(Boolean) : c.themes,
+      physicalRating: physical ? physical.split(',').map((v) => Number(v)).filter(Boolean) : c.physicalRating,
+      durationMin,
+      durationMax,
+      startDate,
+      endDate,
+    }))
+    if (regions) setPendingDestinations(regions.split(',').filter(Boolean))
+  }, [])
+
+  // Push state to URL when key params change
+  useEffect(() => {
+    const params = new URLSearchParams()
+    if (query) params.set('q', query)
+    if (appliedFilters.marketingRegions.length) params.set('regions', appliedFilters.marketingRegions.join(','))
+    if (appliedFilters.styles.length) params.set('styles', appliedFilters.styles.join(','))
+    if (appliedFilters.themes.length) params.set('themes', appliedFilters.themes.join(','))
+    if (appliedFilters.physicalRating.length) params.set('physical', appliedFilters.physicalRating.join(','))
+    if (appliedFilters.durationMin) params.set('durationMin', appliedFilters.durationMin)
+    if (appliedFilters.durationMax) params.set('durationMax', appliedFilters.durationMax)
+    if (appliedFilters.startDate) params.set('startDate', appliedFilters.startDate)
+    if (appliedFilters.endDate) params.set('endDate', appliedFilters.endDate)
+    if (sortBy) params.set('sort', sortBy)
+    const newUrl = `${window.location.pathname}?${params.toString()}`
+    window.history.replaceState({}, '', newUrl)
+  }, [query, appliedFilters, sortBy])
+
+  const [collapsed, setCollapsed] = useState({
+    destinations: false,
+    duration: false,
+    deals: false,
+    physical: false,
+    styles: false,
+    themes: false,
+  })
+
+  function toggleCollapse(key) {
+    setCollapsed((c) => ({ ...c, [key]: !c[key] }))
+  }
+
+  function getFacetCount(field, value) {
+    const fieldObj = facetCounts.find((f) => f.field_name === field)
+    if (!fieldObj || !Array.isArray(fieldObj.counts)) return 0
+    const found = fieldObj.counts.find((c) => String(c.value) === String(value))
+    return found ? found.count : 0
   }
 
   const hasResults = products.length > 0
+
+  function renderHighlighted(text, q) {
+    if (!q) return text
+    const s = String(text)
+    const qTrim = q.trim()
+    if (!qTrim) return s
+    const sLower = s.toLowerCase()
+    const qLower = qTrim.toLowerCase()
+    const idx = sLower.indexOf(qLower)
+    if (idx === -1) return s
+    const before = s.slice(0, idx)
+    const match = s.slice(idx, idx + qTrim.length)
+    const after = s.slice(idx + qTrim.length)
+    return (
+      <>
+        {before}
+        <strong>{match}</strong>
+        {after}
+      </>
+    )
+  }
+
+  
 
   return (
     <>
@@ -406,7 +641,7 @@ function ProductSearchPage({ selectedCurrency }) {
         <div className="search-count">
           <strong>{isLoading ? '...' : totalFound.toLocaleString()}</strong> trips found
         </div>
-        <div className="search-pill">
+        <div className="search-pill" ref={searchContainerRef}>
           <div className="search-input">
             <span className="search-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24">
@@ -420,28 +655,101 @@ function ProductSearchPage({ selectedCurrency }) {
               type="search"
               placeholder="Search destination, trip name, city, or style"
               value={query}
-              onChange={(event) => setQuery(event.target.value)}
+              onChange={(event) => {
+                setQuery(event.target.value)
+              }}
+              onKeyDown={(e) => {
+                if (!showSuggestions || suggestions.length === 0) return
+                if (e.key === 'ArrowDown') {
+                  e.preventDefault()
+                  setSelectedSuggestionIndex((i) => Math.min(suggestions.length - 1, i + 1))
+                } else if (e.key === 'ArrowUp') {
+                  e.preventDefault()
+                  setSelectedSuggestionIndex((i) => Math.max(-1, i - 1))
+                } else if (e.key === 'Enter') {
+                  if (selectedSuggestionIndex >= 0 && suggestions[selectedSuggestionIndex]) {
+                    e.preventDefault()
+                    const val = suggestions[selectedSuggestionIndex]
+                    setQuery(val)
+                    setShowSuggestions(false)
+                    setSelectedSuggestionIndex(-1)
+                  }
+                } else if (e.key === 'Escape') {
+                  setShowSuggestions(false)
+                  setSelectedSuggestionIndex(-1)
+                }
+              }}
+              onFocus={() => { if (query) setShowSuggestions(true) }}
               aria-label="Search trips"
             />
+            {query ? (
+              <button
+                className="clear-query"
+                aria-label="Clear search"
+                onClick={() => {
+                  setQuery('')
+                  setSuggestions([])
+                  setShowSuggestions(false)
+                }}
+              >
+                ×
+              </button>
+            ) : null}
           </div>
 
           <div className="search-divider" aria-hidden="true" />
 
-          <div className="search-dates">
-            <span className="calendar-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24">
-                <path
-                  d="M7 2h2v2h6V2h2v2h3v18H4V4h3V2zm12 8H5v9h14v-9z"
-                  fill="currentColor"
-                />
-              </svg>
-            </span>
-            <input type="text" placeholder="Start date" aria-label="Start date" />
-            <span aria-hidden="true">to</span>
-            <input type="text" placeholder="End date" aria-label="End date" />
-          </div>
+          <button className="filters-toggle" onClick={() => setMobileFiltersOpen((s) => !s)} aria-label="Toggle filters">
+            Filters
+          </button>
 
-          <button type="button" className="search-button">
+                  <div className="search-dates">
+                    <div className="date-control" role="button" tabIndex={0} onClick={() => setShowStartDatePicker((s) => !s)}>
+                      <span className="calendar-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24">
+                          <path d="M7 2h2v2h6V2h2v2h3v18H4V4h3V2zm12 8H5v9h14v-9z" fill="currentColor" />
+                        </svg>
+                      </span>
+                      <div className="start-date-label">{appliedFilters.startDate ? new Date(appliedFilters.startDate).toLocaleDateString() : 'Start date'}</div>
+                      {showStartDatePicker ? (
+                        <input
+                          type="date"
+                          className="start-date-picker"
+                          value={appliedFilters.startDate || ''}
+                          onChange={(e) => {
+                            const v = e.target.value
+                            setAppliedFilters((c) => ({ ...c, startDate: v }))
+                            setShowStartDatePicker(false)
+                          }}
+                        />
+                      ) : null}
+                    </div>
+
+                    <div style={{ width: 12 }} />
+
+                    <div className="date-control" role="button" tabIndex={0} onClick={() => setShowEndDatePicker((s) => !s)}>
+                      <span className="calendar-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24">
+                          <path d="M7 2h2v2h6V2h2v2h3v18H4V4h3V2zm12 8H5v9h14v-9z" fill="currentColor" />
+                        </svg>
+                      </span>
+                      <div className="end-date-label">{appliedFilters.endDate ? new Date(appliedFilters.endDate).toLocaleDateString() : 'End date'}</div>
+                      {showEndDatePicker ? (
+                        <input
+                          type="date"
+                          className="end-date-picker"
+                          value={appliedFilters.endDate || ''}
+                          onChange={(e) => {
+                            const v = e.target.value
+                            setAppliedFilters((c) => ({ ...c, endDate: v }))
+                            setShowEndDatePicker(false)
+                          }}
+                        />
+                      ) : null}
+                    </div>
+                  </div>
+
+          <button type="button" className="search-button" onClick={() => { /* visual-only, main search reacts to query */ }}>
             <span>Search</span>
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path
@@ -450,8 +758,66 @@ function ProductSearchPage({ selectedCurrency }) {
               />
             </svg>
           </button>
+
+          {showSuggestions && suggestions.length > 0 ? (
+            <div className="suggestions-dropdown" role="listbox">
+              <div className="suggestions-title">SUGGESTED SEARCHES</div>
+              <ul>
+                {suggestions.map((sug, idx) => (
+                  <li
+                    key={sug}
+                    className={"suggestion-item" + (idx === selectedSuggestionIndex ? ' selected' : '')}
+                    role="option"
+                    aria-selected={idx === selectedSuggestionIndex}
+                    onMouseDown={(e) => {
+                      // prevent blur before click
+                      e.preventDefault()
+                      setQuery(sug)
+                      setShowSuggestions(false)
+                      setSelectedSuggestionIndex(-1)
+                    }}
+                    onMouseEnter={() => setSelectedSuggestionIndex(idx)}
+                    onClick={() => { /* click handled onMouseDown */ }}
+                  >
+                    <span className="suggestion-icon" aria-hidden="true">🔍</span>
+                    <span className="suggestion-text">{renderHighlighted(sug, query)}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
         </div>
       </section>
+
+      <div className="active-chips">
+        {appliedFilters.marketingRegions.map((m) => (
+          <div key={`chip-m-${m}`} className="chip">
+            <span>{m}</span>
+            <button onClick={() => setAppliedFilters((c) => ({ ...c, marketingRegions: c.marketingRegions.filter(x => x !== m) }))}>×</button>
+          </div>
+        ))}
+
+        {appliedFilters.styles.map((stored) => {
+          const label = STYLE_VALUE_TO_UI[stored] || stored
+          return (
+            <div key={`chip-s-${stored}`} className="chip">
+              <span>{label}</span>
+              <button onClick={() => setAppliedFilters((c) => ({ ...c, styles: c.styles.filter(x => x !== stored) }))}>×</button>
+            </div>
+          )
+        })}
+
+        {appliedFilters.startDate ? (
+          <div key={`chip-date`} className="chip">
+            <span>{appliedFilters.startDate && appliedFilters.endDate ? `${new Date(appliedFilters.startDate).toLocaleDateString()} — ${new Date(appliedFilters.endDate).toLocaleDateString()}` : new Date(appliedFilters.startDate).toLocaleDateString()}</span>
+            <button onClick={() => setAppliedFilters((c) => ({ ...c, startDate: '', endDate: '' }))}>×</button>
+          </div>
+        ) : null}
+
+        {(appliedFilters.marketingRegions.length || appliedFilters.styles.length) ? (
+          <button className="clear-all" onClick={clearFilters}>Clear all filters</button>
+        ) : null}
+      </div>
 
       <section className="results" id="results" aria-live="polite">
         <div className="results-toolbar">
@@ -468,166 +834,231 @@ function ProductSearchPage({ selectedCurrency }) {
         </div>
 
         <div className="results-layout">
-          <aside className="filters">
+          <aside className={mobileFiltersOpen ? 'filters mobile-open' : 'filters'}>
+              {mobileFiltersOpen ? (
+                <div style={{display:'flex', justifyContent:'flex-end', marginBottom:8}}>
+                  <button className="clear-all" onClick={() => setMobileFiltersOpen(false)}>Close</button>
+                </div>
+              ) : null}
               <div className="filter-block">
-                <div className="filter-header">
-                  <h3>Destinations</h3>
-                  <button type="button" onClick={() => setFilters((current) => ({ ...current, marketingRegion: 'all' }))}>
-                    Clear
-                  </button>
+                <div className="filter-header filter-section-header">
+                  <div className={collapsed.destinations ? 'collapsible closed' : 'collapsible'} onClick={() => toggleCollapse('destinations')}>
+                    <span className="arrow">▾</span>
+                    <h3>Destinations</h3>
+                  </div>
+                  <div>
+                    {appliedFilters.marketingRegions.length > 0 ? (
+                      <button type="button" onClick={() => { setAppliedFilters((c) => ({ ...c, marketingRegions: [] })); setPendingDestinations([]) }}>Reset</button>
+                    ) : null}
+                  </div>
                 </div>
-                <div className="filter-options">
-                  {marketingRegionOptions.map((option) => (
-                    <FilterOption
-                      key={option.label}
-                      label={option.label}
-                      count={option.count}
-                      active={filters.marketingRegion === option.label}
-                      onClick={() =>
-                        setFilters((current) => ({
-                          ...current,
-                          marketingRegion: option.label,
-                        }))
-                      }
-                    />
-                  ))}
-                </div>
-                <button type="button" className="filter-apply">
-                  Apply
-                </button>
+                {!collapsed.destinations ? (
+                  <>
+                    <div className="filter-options">
+                      {marketingRegionOptions.map((option) => {
+                        const checked = pendingDestinations.includes(option.label)
+                        return (
+                          <label key={option.label} className="filter-option" onClick={() => {
+                            setPendingDestinations((current) => current.includes(option.label) ? current.filter(x => x !== option.label) : [...current, option.label])
+                          }}>
+                            <span className={checked ? 'checkbox-square checked' : 'checkbox-square'} aria-hidden="true">{checked ? '✓' : ''}</span>
+                            <span className="filter-option-label">{option.label}</span>
+                            <span className="count-badge">{option.count ?? 0}</span>
+                          </label>
+                        )
+                      })}
+                    </div>
+                    <div style={{ marginTop: 8 }}>
+                      <button type="button" className="filter-apply" onClick={() => setAppliedFilters((c) => ({ ...c, marketingRegions: Array.from(new Set(pendingDestinations)) }))}>
+                        Apply
+                      </button>
+                    </div>
+                  </>
+                ) : null}
               </div>
 
               <div className="filter-block">
-                <div className="filter-header">
-                  <h3>Duration</h3>
-                  <button type="button" onClick={() => setFilters((current) => ({ ...current, durationMin: '', durationMax: '' }))}>
-                    Any
-                  </button>
+                <div className="filter-header filter-section-header">
+                  <div className={collapsed.duration ? 'collapsible closed' : 'collapsible'} onClick={() => toggleCollapse('duration')}>
+                    <span className="arrow">▾</span>
+                    <h3>Duration</h3>
+                  </div>
+                  <div>
+                    {(appliedFilters.durationMin || appliedFilters.durationMax) ? (
+                      <button type="button" onClick={() => setAppliedFilters((c) => ({ ...c, durationMin: '', durationMax: '' }))}>Reset</button>
+                    ) : null}
+                  </div>
                 </div>
-                <div className="filter-range">
-                  <label>
-                    Min
-                    <select value={filters.durationMin} onChange={(event) => setFilters((current) => ({ ...current, durationMin: event.target.value }))}>
-                      <option value="">Any</option>
-                      <option value="3">3</option>
-                      <option value="7">7</option>
-                      <option value="10">10</option>
-                      <option value="14">14</option>
-                    </select>
-                  </label>
-                  <span>to</span>
-                  <label>
-                    Max
-                    <select value={filters.durationMax} onChange={(event) => setFilters((current) => ({ ...current, durationMax: event.target.value }))}>
-                      <option value="">Any</option>
-                      <option value="10">10</option>
-                      <option value="14">14</option>
-                      <option value="21">21</option>
-                      <option value="30">30</option>
-                    </select>
-                  </label>
-                </div>
+                {!collapsed.duration ? (
+                  <div className="filter-range">
+                    <label>
+                      Min
+                      <select value={appliedFilters.durationMin} onChange={(event) => setAppliedFilters((c) => ({ ...c, durationMin: event.target.value }))}>
+                        <option value="">Any</option>
+                        <option value="1">1</option>
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                        <option value="30">30</option>
+                      </select>
+                    </label>
+                    <span>to</span>
+                    <label>
+                      Max
+                      <select value={appliedFilters.durationMax} onChange={(event) => setAppliedFilters((c) => ({ ...c, durationMax: event.target.value }))}>
+                        <option value="">Any</option>
+                        <option value="1">1</option>
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                        <option value="30">30</option>
+                      </select>
+                    </label>
+                  </div>
+                ) : null}
               </div>
 
               <div className="filter-block">
                 <div className="filter-header">
                   <h3>Price ({selectedCurrency.toUpperCase()})</h3>
-                  <button type="button" onClick={() => setFilters((current) => ({ ...current, priceMin: '', priceMax: '' }))}>
+                  <button type="button" onClick={() => setAppliedFilters((current) => ({ ...current, priceMin: '', priceMax: '' }))}>
                     Any
                   </button>
                 </div>
                 <div className="filter-range">
                   <label>
                     Min
-                    <input type="number" placeholder={`Min ${selectedCurrency.toUpperCase()}`} value={filters.priceMin} onChange={(event) => setFilters((current) => ({ ...current, priceMin: event.target.value }))} />
+                    <input type="number" placeholder={`Min ${selectedCurrency.toUpperCase()}`} value={appliedFilters.priceMin} onChange={(event) => setAppliedFilters((current) => ({ ...current, priceMin: event.target.value }))} />
                   </label>
                   <span>to</span>
                   <label>
                     Max
-                    <input type="number" placeholder={`Max ${selectedCurrency.toUpperCase()}`} value={filters.priceMax} onChange={(event) => setFilters((current) => ({ ...current, priceMax: event.target.value }))} />
+                    <input type="number" placeholder={`Max ${selectedCurrency.toUpperCase()}`} value={appliedFilters.priceMax} onChange={(event) => setAppliedFilters((current) => ({ ...current, priceMax: event.target.value }))} />
                   </label>
                 </div>
               </div>
 
               <div className="filter-block">
-                <div className="filter-header">
-                  <h3>Travel deals</h3>
-                </div>
-                <div className="filter-options">
-                  <label className="filter-option">
-                    <input type="checkbox" checked={filters.onSale} onChange={(event) => setFilters((current) => ({ ...current, onSale: event.target.checked }))} />
-                    <span className="filter-option-label">Trips on sale</span>
-                  </label>
-                  <label className="filter-option">
-                    <input type="checkbox" />
-                    <span className="filter-option-label">Early bird</span>
-                  </label>
-                  <label className="filter-option">
-                    <input type="checkbox" />
-                    <span className="filter-option-label">Last minute deals</span>
-                  </label>
-                </div>
-              </div>
-
-              <div className="filter-block">
-                <div className="filter-header">
-                  <h3>Styles</h3>
-                  <button type="button" onClick={() => setFilters((current) => ({ ...current, style: 'all' }))}>
-                    Clear
-                  </button>
-                </div>
-                <div className="filter-options">
-                  {styleOptions.map((option) => (
-                    <FilterOption
-                      key={option.label}
-                      label={option.label}
-                      count={option.count}
-                      active={filters.style === option.label}
-                      onClick={() =>
-                        setFilters((current) => ({
-                          ...current,
-                          style: option.label,
-                        }))
-                      }
-                    />
-                  ))}
-                </div>
-              </div>
-
-              <div className="filter-block">
-                <div className="filter-header">
-                  <h3>Physical rating</h3>
-                </div>
-                <div className="rating-toggle">
-                  <span>Physical rating</span>
-                  <div className="rating-bars" aria-hidden="true">
-                    <span className="bar filled" />
-                    <span className="bar filled" />
-                    <span className="bar filled" />
-                    <span className="bar" />
-                    <span className="bar" />
+                <div className="filter-header filter-section-header">
+                  <div className={collapsed.deals ? 'collapsible closed' : 'collapsible'} onClick={() => toggleCollapse('deals')}>
+                    <span className="arrow">▾</span>
+                    <h3>Travel deals</h3>
+                  </div>
+                  <div>
+                    {(appliedFilters.onSale || appliedFilters.newTrips) ? (
+                      <button type="button" onClick={() => setAppliedFilters((c) => ({ ...c, onSale: false, newTrips: false }))}>Reset</button>
+                    ) : null}
                   </div>
                 </div>
+                {!collapsed.deals ? (
+                  <div className="filter-options">
+                    <label className="filter-option" onClick={() => setAppliedFilters((c) => ({ ...c, onSale: !c.onSale }))}>
+                      <span className={appliedFilters.onSale ? 'checkbox-square checked' : 'checkbox-square'} aria-hidden="true">{appliedFilters.onSale ? '✓' : ''}</span>
+                      <span className="filter-option-label">Trips on sale</span>
+                      <span className="count-badge">{onSaleCount ?? ''}</span>
+                    </label>
+                    <label className="filter-option">
+                      <span className={false ? 'checkbox-square checked' : 'checkbox-square'} aria-hidden="true"></span>
+                      <span className="filter-option-label">Early bird</span>
+                    </label>
+                    <label className="filter-option">
+                      <span className={false ? 'checkbox-square checked' : 'checkbox-square'} aria-hidden="true"></span>
+                      <span className="filter-option-label">Last minute deals</span>
+                    </label>
+                    <label className="filter-option" onClick={() => setAppliedFilters((c) => ({ ...c, newTrips: !c.newTrips }))}>
+                      <span className={appliedFilters.newTrips ? 'checkbox-square checked' : 'checkbox-square'} aria-hidden="true">{appliedFilters.newTrips ? '✓' : ''}</span>
+                      <span className="filter-option-label">New trips</span>
+                    </label>
+                  </div>
+                ) : null}
               </div>
 
               <div className="filter-block">
-                <div className="filter-header">
-                  <h3>Themes</h3>
+                <div className="filter-header filter-section-header">
+                  <div className={collapsed.styles ? 'collapsible closed' : 'collapsible'} onClick={() => toggleCollapse('styles')}>
+                    <span className="arrow">▾</span>
+                    <h3>Styles</h3>
+                  </div>
+                  <div>
+                    {appliedFilters.styles.length > 0 ? (
+                      <button type="button" onClick={() => setAppliedFilters((c) => ({ ...c, styles: [] }))}>Reset</button>
+                    ) : null}
+                  </div>
                 </div>
-                <div className="filter-options">
-                  <label className="filter-option">
-                    <input type="checkbox" />
-                    <span className="filter-option-label">Wildlife</span>
-                  </label>
-                  <label className="filter-option">
-                    <input type="checkbox" />
-                    <span className="filter-option-label">Walking & hiking</span>
-                  </label>
-                  <label className="filter-option">
-                    <input type="checkbox" />
-                    <span className="filter-option-label">Family</span>
-                  </label>
+                {!collapsed.styles ? (
+                  <div className="filter-options">
+                    {styleOptions.map((opt) => {
+                      const uiLabel = opt.label
+                      const storedVal = STYLE_UI_TO_VALUE[uiLabel] || uiLabel
+                      const checked = appliedFilters.styles.includes(storedVal)
+                      return (
+                        <label key={uiLabel} className="filter-option" onClick={() => setAppliedFilters((c) => ({ ...c, styles: c.styles.includes(storedVal) ? c.styles.filter(x => x !== storedVal) : [...c.styles, storedVal] }))}>
+                          <span className={checked ? 'checkbox-square checked' : 'checkbox-square'} aria-hidden="true">{checked ? '✓' : ''}</span>
+                          <span className="filter-option-label">{uiLabel}</span>
+                          <span className="count-badge">{opt.count ?? 0}</span>
+                        </label>
+                      )
+                    })}
+                  </div>
+                ) : null}
+              </div>
+
+              <div className="filter-block">
+                <div className="filter-header filter-section-header">
+                  <div className={collapsed.physical ? 'collapsible closed' : 'collapsible'} onClick={() => toggleCollapse('physical')}>
+                    <span className="arrow">▾</span>
+                    <h3>Physical rating</h3>
+                  </div>
+                  <div>
+                    {appliedFilters.physicalRating.length > 0 ? (
+                      <button type="button" onClick={() => setAppliedFilters((c) => ({ ...c, physicalRating: [] }))}>Reset</button>
+                    ) : null}
+                  </div>
                 </div>
+                {!collapsed.physical ? (
+                  <div className="filter-options">
+                    {[1,2,3,4,5].map((n) => {
+                      const checked = appliedFilters.physicalRating.includes(n)
+                      return (
+                        <label key={n} className="filter-option" onClick={() => setAppliedFilters((c) => ({ ...c, physicalRating: c.physicalRating.includes(n) ? c.physicalRating.filter(x => x !== n) : [...c.physicalRating, n] }))}>
+                          <span className={checked ? 'checkbox-square checked' : 'checkbox-square'} aria-hidden="true">{checked ? '✓' : ''}</span>
+                          <span className="filter-option-label">{n} <span style={{color:'var(--ink-muted)', fontWeight:600}}>&nbsp;stars</span></span>
+                          <span className="count-badge">{physicalCounts.get(n) ?? 0}</span>
+                        </label>
+                      )
+                    })}
+                  </div>
+                ) : null}
+              </div>
+
+              <div className="filter-block">
+                <div className="filter-header filter-section-header">
+                  <div className={collapsed.themes ? 'collapsible closed' : 'collapsible'} onClick={() => toggleCollapse('themes')}>
+                    <span className="arrow">▾</span>
+                    <h3>Themes</h3>
+                  </div>
+                  <div>
+                    {appliedFilters.themes.length > 0 ? (
+                      <button type="button" onClick={() => setAppliedFilters((c) => ({ ...c, themes: [] }))}>Reset</button>
+                    ) : null}
+                  </div>
+                </div>
+                {!collapsed.themes ? (
+                  <div className="filter-options">
+                    {themeOptions.map((opt) => {
+                      const checked = appliedFilters.themes.includes(opt.label)
+                      return (
+                        <label key={opt.label} className="filter-option" onClick={() => setAppliedFilters((c) => ({ ...c, themes: c.themes.includes(opt.label) ? c.themes.filter(x => x !== opt.label) : [...c.themes, opt.label] }))}>
+                          <span className={checked ? 'checkbox-square checked' : 'checkbox-square'} aria-hidden="true">{checked ? '✓' : ''}</span>
+                          <span className="filter-option-label">{opt.label}</span>
+                          <span className="count-badge">{opt.count ?? 0}</span>
+                        </label>
+                      )
+                    })}
+                  </div>
+                ) : null}
               </div>
 
               <button type="button" className="clear-all" onClick={clearFilters}>
@@ -650,8 +1081,9 @@ function ProductSearchPage({ selectedCurrency }) {
             {!isLoading && !error && hasResults ? (
               <div className="cards-grid">
                 {products.map((product) => {
-                  const heroImage = buildAssetUrl(product.productImages?.[0]?.url || product.map?.url)
+                  const heroImage = buildAssetUrl(product.map?.url || product.productImages?.[0]?.url)
                   const heroAlt = product.productImages?.[0]?.alt || product.map?.alt || product.name
+                  const priceInfo = getLowestPrice(product.lowestPrice, selectedCurrency)
 
                   return (
                   <article key={product.productId ?? product.id} className="trip-card">
@@ -728,14 +1160,17 @@ function ProductSearchPage({ selectedCurrency }) {
                         </button>
                       </div>
 
-                      {getLowestPrice(product.lowestPrice, selectedCurrency)?.price ? (
+                      {priceInfo?.price ? (
                         <div className="price-row">
                           <div className="price-text">
                             <span>From</span>
                             <strong>
-                              {getLowestPrice(product.lowestPrice, selectedCurrency).currency}{' '}
-                              {Math.round(getLowestPrice(product.lowestPrice, selectedCurrency).price)}
+                              {priceInfo.currency}{' '}
+                              {Math.round(priceInfo.price)}
                             </strong>
+                            {priceInfo.onSale && priceInfo.originalPrice && priceInfo.originalPrice > priceInfo.price ? (
+                              <div className="product-card-price-compare">{priceInfo.currency} {Math.round(priceInfo.originalPrice)}</div>
+                            ) : null}
                           </div>
                           <div className="price-meta">
                             {product.productCode && <div className="product-code">{product.productCode}</div>}
