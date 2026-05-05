@@ -13,7 +13,9 @@
     "import:data": "node scripts/importData.js",
     "import:products": "node scripts/importProducts.js",
     "export:data": "node scripts/exportData.js",
-    "test:search": "node scripts/searchTest.js"
+    "test:search": "node scripts/searchTest.js",
+
+    "test:multi-search": "node scripts/multiQuerySearch.js"
   },
   "repository": {
     "type": "git",
