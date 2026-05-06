@@ -3,6 +3,7 @@ import { Link, Route, Routes, useParams } from 'react-router-dom'
 import Typesense from 'typesense'
 import './App.css'
 import { client, TYPESENSE_COLLECTION, TYPESENSE_READY } from './typesense/client'
+import InsightsDashboard from './InsightsDashboard'
 import { buildSearchQuery, getFacetOptions, buildFilterBy } from './typesense/helpers'
 
 
@@ -44,6 +45,31 @@ const SORT_OPTIONS = [
   { label: 'Rating', value: 'rating_desc' },
   { label: 'Soonest departure', value: 'startDate_asc' },
 ]
+
+const EMPTY_SEARCH_PINNED_HITS = [
+  { id: '2802734', position: 1 },
+  { id: '2802735', position: 2 },
+  { id: '2802736', position: 3 },
+]
+
+function getSortBy(selectedSort, currency) {
+  switch (selectedSort) {
+    case 'price_asc':
+      return `lowestPrice.${currency}.price:asc`
+    case 'price_desc':
+      return `lowestPrice.${currency}.price:desc`
+    case 'duration_asc':
+      return 'duration:asc'
+    case 'duration_desc':
+      return 'duration:desc'
+    case 'rating_desc':
+      return 'reviewRating:desc'
+    case 'startDate_asc':
+      return 'startDate:asc'
+    default:
+      return '_text_match:desc'
+  }
+}
 
 const SEARCH_FIELDS =
   'name,primaryCountry,destinations,locations,marketingRegions,themes,styles'
@@ -135,6 +161,53 @@ function getPrimaryValue(values, fallback = 'Unknown') {
   return fallback
 }
 
+function getOrCreateAnalyticsUserId() {
+  let userId = localStorage.getItem('typesense_analytics_user_id')
+
+  if (!userId) {
+    userId =
+      typeof crypto !== 'undefined' && crypto.randomUUID
+        ? crypto.randomUUID()
+        : `user_${Date.now()}_${Math.random().toString(36).slice(2)}`
+
+    localStorage.setItem('typesense_analytics_user_id', userId)
+  }
+
+  return userId
+}
+
+async function trackDepartureEvent(eventType, trip, searchQuery) {
+  try {
+    if (!trip) return
+
+    const docId = String(
+      trip.id ||
+        trip.objectID ||
+        trip.departureId ||
+        `${trip.productCode || 'unknown'}_${Date.now()}`,
+    )
+
+    const eventDoc = {
+      eventType,
+      docId,
+      productId: Number(trip.productId || 0),
+      productCode: String(trip.productCode || ''),
+      tripName: String(trip.name || ''),
+      query: String(searchQuery || ''),
+      userId: getOrCreateAnalyticsUserId(),
+      timestamp: Math.floor(Date.now() / 1000),
+    }
+
+    // NOTE: For production, send events to a backend proxy instead of writing from the client.
+    await client.collections('departure_events').documents().create(eventDoc)
+
+    console.log('Tracked departure event:', eventDoc)
+  } catch (error) {
+    console.error('Failed to track departure event:', error)
+  }
+}
+
+
 // Typesense helpers moved to ./typesense/helpers.js
 
 function FilterOption({ label, count, active, onClick }) {
@@ -185,26 +258,10 @@ function ProductSearchPage({ selectedCurrency }) {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
   const [curationMetadata, setCurationMetadata] = useState(null)
+  const [emptySearchMerchandising, setEmptySearchMerchandising] = useState(false)
 
   const adjustedSortBy = useMemo(() => {
-    switch (sortBy) {
-      case 'relevance':
-        return '_text_match:desc'
-      case 'price_asc':
-        return `lowestPrice.${selectedCurrency}.price:asc`
-      case 'price_desc':
-        return `lowestPrice.${selectedCurrency}.price:desc`
-      case 'duration_asc':
-        return 'duration:asc'
-      case 'duration_desc':
-        return 'duration:desc'
-      case 'rating_desc':
-        return 'reviewRating:desc'
-      case 'startDate_asc':
-        return 'startDate:asc'
-      default:
-        return '_text_match:desc'
-    }
+    return getSortBy(sortBy, selectedCurrency)
   }, [sortBy, selectedCurrency])
 
   const marketingRegionOptions = useMemo(() => {
@@ -303,20 +360,67 @@ function ProductSearchPage({ selectedCurrency }) {
       }
 
       try {
+        const normalizedQuery = query.trim()
+        const hasSearchQuery = normalizedQuery.length > 0
+        const isRelevanceSort = sortBy === 'relevance'
+        const shouldUseEmptyPinnedHits =
+          !hasSearchQuery && emptySearchMerchandising && isRelevanceSort
+        const filterBy = buildFilterBy(appliedFilters, selectedCurrency)
+
+        const qlen = hasSearchQuery ? normalizedQuery.length : 0
+        let numTypos = 0
+        if (qlen >= 5) numTypos = 2
+        else if (qlen >= 3) numTypos = 1
+
         const baseParams = {
-          ...buildSearchQuery(query, adjustedSortBy, appliedFilters, selectedCurrency),
+          q: hasSearchQuery ? normalizedQuery : '*',
+          query_by: SEARCH_FIELDS,
+          filter_by: filterBy || undefined,
           facet_by: 'marketingRegions,styles,themes,physicalRating,productId',
           max_facet_values: 2000,
           per_page: SEARCH_PAGE_SIZE,
+          enable_curations: hasSearchQuery && isRelevanceSort,
+          num_typos: numTypos,
         }
 
-        const response = await client
-          .collections(TYPESENSE_COLLECTION)
-          .documents()
-          .search({
-            ...baseParams,
-            page: 1,
-          })
+        if (shouldUseEmptyPinnedHits) {
+          baseParams.pinned_hits = EMPTY_SEARCH_PINNED_HITS
+            .map((item) => `${item.id}:${item.position}`)
+            .join(',')
+        }
+
+        if (!isRelevanceSort) {
+          const sortValue = getSortBy(sortBy, selectedCurrency)
+          if (sortValue) baseParams.sort_by = sortValue
+        }
+
+        let response
+        try {
+          response = await client
+            .collections(TYPESENSE_COLLECTION)
+            .documents()
+            .search({
+              ...baseParams,
+              page: 1,
+            })
+        } catch (searchError) {
+          const errorMessage = String(searchError?.message || '')
+          const isSortError = /sort_by|sort by|field .* not found|could not find a field/i.test(errorMessage)
+          if (!isRelevanceSort && isSortError) {
+            console.warn('Sort error, falling back to relevance:', errorMessage)
+            response = await client
+              .collections(TYPESENSE_COLLECTION)
+              .documents()
+              .search({
+                ...baseParams,
+                enable_curations: hasSearchQuery,
+                sort_by: '_text_match:desc',
+                page: 1,
+              })
+          } else {
+            throw searchError
+          }
+        }
 
         console.log('Typesense search result:', response)
 
@@ -324,12 +428,16 @@ function ProductSearchPage({ selectedCurrency }) {
           return
         }
 
-        const metadata =
-          response.metadata ??
-          response.curated_metadata ??
-          response.curation_metadata ??
-          response.search_cutoff_metadata
-        setCurationMetadata(metadata || null)
+        if (hasSearchQuery && isRelevanceSort) {
+          const metadata =
+            response.metadata ??
+            response.curated_metadata ??
+            response.curation_metadata ??
+            response.search_cutoff_metadata
+          setCurationMetadata(metadata || null)
+        } else {
+          setCurationMetadata(null)
+        }
 
         const firstHits = Array.isArray(response.hits) ? response.hits : []
         const found = Number(response.found ?? firstHits.length)
@@ -404,7 +512,7 @@ function ProductSearchPage({ selectedCurrency }) {
       isActive = false
       window.clearTimeout(timer)
     }
-  }, [query, adjustedSortBy, appliedFilters, selectedCurrency])
+  }, [query, adjustedSortBy, appliedFilters, selectedCurrency, emptySearchMerchandising, sortBy])
 
   // Suggestions fetching (debounced shorter than main search)
   useEffect(() => {
@@ -669,6 +777,7 @@ function ProductSearchPage({ selectedCurrency }) {
               value={query}
               onChange={(event) => {
                 setQuery(event.target.value)
+                setEmptySearchMerchandising(false)
               }}
               onKeyDown={(e) => {
                 if (!showSuggestions || suggestions.length === 0) return
@@ -702,6 +811,8 @@ function ProductSearchPage({ selectedCurrency }) {
                   setQuery('')
                   setSuggestions([])
                   setShowSuggestions(false)
+                  setEmptySearchMerchandising(false)
+                  setCurationMetadata(null)
                 }}
               >
                 ×
@@ -761,7 +872,14 @@ function ProductSearchPage({ selectedCurrency }) {
                     </div>
                   </div>
 
-          <button type="button" className="search-button" onClick={() => { /* visual-only, main search reacts to query */ }}>
+          <button
+            type="button"
+            className="search-button"
+            onClick={() => {
+              const isEmpty = query.trim().length === 0
+              setEmptySearchMerchandising(isEmpty)
+            }}
+          >
             <span>Search</span>
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path
@@ -1123,7 +1241,11 @@ function ProductSearchPage({ selectedCurrency }) {
 
                   return (
                   <article key={product.productId ?? product.id} className="trip-card">
-                    <Link className="card-link" to={`/product/${product.productId}`}>
+                    <Link
+                      className="card-link"
+                      to={`/product/${product.productId}`}
+                      onClick={() => trackDepartureEvent('click', product, query)}
+                    >
                       <div
                         className="card-image"
                         style={heroImage ? { backgroundImage: `url(${heroImage})` } : undefined}
@@ -1147,7 +1269,11 @@ function ProductSearchPage({ selectedCurrency }) {
                         </button>
                       </div>
 
-                      <Link className="card-title" to={`/product/${product.productId}`}>
+                      <Link
+                        className="card-title"
+                        to={`/product/${product.productId}`}
+                        onClick={() => trackDepartureEvent('click', product, query)}
+                      >
                         <h3>{product.name}</h3>
                       </Link>
                       <p className="card-subtitle">
@@ -1183,10 +1309,25 @@ function ProductSearchPage({ selectedCurrency }) {
                       </div>
 
                       <div className="card-actions">
-                        <Link className="compare-button" to={`/product/${product.productId}`}>
+                        <Link
+                          className="compare-button"
+                          to={`/product/${product.productId}`}
+                          onClick={(event) => {
+                            event.stopPropagation()
+                            trackDepartureEvent('conversion', product, query)
+                          }}
+                        >
                           + View departures
                         </Link>
-                        <button type="button" className="icon-button" aria-label="Compare">
+                        <button
+                          type="button"
+                          className="icon-button"
+                          aria-label="Compare"
+                          onClick={(event) => {
+                            event.stopPropagation()
+                            trackDepartureEvent('conversion', product, query)
+                          }}
+                        >
                           <svg viewBox="0 0 24 24" aria-hidden="true">
                             <path
                               d="M7 4h2v16H7V4zm8 0h2v16h-2V4z"
@@ -1438,8 +1579,26 @@ function ProductDetailPage({ selectedCurrency }) {
               </div>
             ) : null}
 
-            <button type="button" className="primary-button">Dates and prices</button>
-            <button type="button" className="secondary-button">+ Add to compare</button>
+            <button
+              type="button"
+              className="primary-button"
+              onClick={(event) => {
+                event.stopPropagation()
+                trackDepartureEvent('conversion', product, '')
+              }}
+            >
+              Dates and prices
+            </button>
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={(event) => {
+                event.stopPropagation()
+                trackDepartureEvent('conversion', product, '')
+              }}
+            >
+              + Add to compare
+            </button>
           </div>
         </aside>
       </div>
@@ -1491,6 +1650,7 @@ function ProductDetailPage({ selectedCurrency }) {
   )
 }
 
+
 function App() {
   const [selectedRegion, setSelectedRegion] = useState('Germany')
 
@@ -1517,6 +1677,7 @@ function App() {
             <Link to="/">Ways to travel</Link>
             <Link to="/">Deals</Link>
             <Link to="/">About</Link>
+            <Link to="/insights">Insights</Link>
           </nav>
 
           <div className="topbar-actions">
@@ -1552,6 +1713,18 @@ function App() {
         <Routes>
           <Route path="/" element={<ProductSearchPage selectedCurrency={selectedCurrency} />} />
           <Route path="/product/:productId" element={<ProductDetailPage selectedCurrency={selectedCurrency} />} />
+          <Route
+            path="/insights"
+            element={
+              <InsightsDashboard
+                selectedRegion={selectedRegion}
+                selectedCurrency={selectedCurrency}
+                regionOptions={REGION_CONFIG}
+                onRegionChange={setSelectedRegion}
+                collectionName={TYPESENSE_COLLECTION}
+              />
+            }
+          />
         </Routes>
 
         <section className="region-selector" aria-label="Select region">

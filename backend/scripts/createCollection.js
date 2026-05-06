@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 const schema = JSON.parse(
-  fs.readFileSync(path.join(__dirname, "../../schema/departures.schema.json"), "utf8")
+  fs.readFileSync(path.join(__dirname, "../../schema/departure.popular.queries.json"), "utf8")
 );
 
 async function createCollection() {
