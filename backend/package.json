@@ -14,7 +14,6 @@
     "import:products": "node scripts/importProducts.js",
     "export:data": "node scripts/exportData.js",
     "test:search": "node scripts/searchTest.js",
-
     "test:multi-search": "node scripts/multiQuerySearch.js"
   },
   "repository": {
@@ -30,7 +29,10 @@
   "homepage": "https://github.com/Bhanuka-Fernando-Intrepid/typesense-poc#readme",
   "dependencies": {
     "algoliasearch": "^5.51.0",
+    "cors": "^2.8.6",
     "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "morgan": "^1.10.1",
     "typesense": "^3.0.6"
   },
   "devDependencies": {
