@@ -135,6 +135,65 @@ function getPrimaryValue(values, fallback = 'Unknown') {
   return fallback
 }
 
+function getOrCreateAnalyticsUserId() {
+  let userId = localStorage.getItem('typesense_analytics_user_id')
+
+  if (!userId) {
+    userId =
+      typeof crypto !== 'undefined' && crypto.randomUUID
+        ? crypto.randomUUID()
+        : `user_${Date.now()}_${Math.random().toString(36).slice(2)}`
+
+    localStorage.setItem('typesense_analytics_user_id', userId)
+  }
+
+  return userId
+}
+
+async function trackDepartureEvent(eventType, trip, searchQuery) {
+  try {
+    if (!trip) return
+
+    const docId = String(
+      trip.id ||
+        trip.objectID ||
+        trip.departureId ||
+        `${trip.productCode || 'unknown'}_${Date.now()}`,
+    )
+
+    const eventDoc = {
+      eventType,
+      docId,
+      productId: Number(trip.productId || 0),
+      productCode: String(trip.productCode || ''),
+      tripName: String(trip.name || ''),
+      query: String(searchQuery || ''),
+      userId: getOrCreateAnalyticsUserId(),
+      timestamp: Math.floor(Date.now() / 1000),
+    }
+
+    // NOTE: For production, send events to a backend proxy instead of writing from the client.
+    await client.collections('departure_events').documents().create(eventDoc)
+
+    console.log('Tracked departure event:', eventDoc)
+  } catch (error) {
+    console.error('Failed to track departure event:', error)
+  }
+}
+
+async function fetchMostClickedTrips() {
+  const result = await client.collections('departure_events').documents().search({
+    q: '*',
+    query_by: 'tripName,productCode,query',
+    filter_by: 'eventType:=click',
+    facet_by: 'productCode',
+    max_facet_values: 10,
+    per_page: 0,
+  })
+
+  console.log('Most clicked trip productCode counts:', result.facet_counts)
+}
+
 // Typesense helpers moved to ./typesense/helpers.js
 
 function FilterOption({ label, count, active, onClick }) {
@@ -1123,7 +1182,11 @@ function ProductSearchPage({ selectedCurrency }) {
 
                   return (
                   <article key={product.productId ?? product.id} className="trip-card">
-                    <Link className="card-link" to={`/product/${product.productId}`}>
+                    <Link
+                      className="card-link"
+                      to={`/product/${product.productId}`}
+                      onClick={() => trackDepartureEvent('click', product, query)}
+                    >
                       <div
                         className="card-image"
                         style={heroImage ? { backgroundImage: `url(${heroImage})` } : undefined}
@@ -1147,7 +1210,11 @@ function ProductSearchPage({ selectedCurrency }) {
                         </button>
                       </div>
 
-                      <Link className="card-title" to={`/product/${product.productId}`}>
+                      <Link
+                        className="card-title"
+                        to={`/product/${product.productId}`}
+                        onClick={() => trackDepartureEvent('click', product, query)}
+                      >
                         <h3>{product.name}</h3>
                       </Link>
                       <p className="card-subtitle">
@@ -1183,10 +1250,25 @@ function ProductSearchPage({ selectedCurrency }) {
                       </div>
 
                       <div className="card-actions">
-                        <Link className="compare-button" to={`/product/${product.productId}`}>
+                        <Link
+                          className="compare-button"
+                          to={`/product/${product.productId}`}
+                          onClick={(event) => {
+                            event.stopPropagation()
+                            trackDepartureEvent('conversion', product, query)
+                          }}
+                        >
                           + View departures
                         </Link>
-                        <button type="button" className="icon-button" aria-label="Compare">
+                        <button
+                          type="button"
+                          className="icon-button"
+                          aria-label="Compare"
+                          onClick={(event) => {
+                            event.stopPropagation()
+                            trackDepartureEvent('conversion', product, query)
+                          }}
+                        >
                           <svg viewBox="0 0 24 24" aria-hidden="true">
                             <path
                               d="M7 4h2v16H7V4zm8 0h2v16h-2V4z"
@@ -1438,8 +1520,26 @@ function ProductDetailPage({ selectedCurrency }) {
               </div>
             ) : null}
 
-            <button type="button" className="primary-button">Dates and prices</button>
-            <button type="button" className="secondary-button">+ Add to compare</button>
+            <button
+              type="button"
+              className="primary-button"
+              onClick={(event) => {
+                event.stopPropagation()
+                trackDepartureEvent('conversion', product, '')
+              }}
+            >
+              Dates and prices
+            </button>
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={(event) => {
+                event.stopPropagation()
+                trackDepartureEvent('conversion', product, '')
+              }}
+            >
+              + Add to compare
+            </button>
           </div>
         </aside>
       </div>
