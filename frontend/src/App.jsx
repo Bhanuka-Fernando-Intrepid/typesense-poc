@@ -3,6 +3,7 @@ import { Link, Route, Routes, useParams } from 'react-router-dom'
 import Typesense from 'typesense'
 import './App.css'
 import { client, TYPESENSE_COLLECTION, TYPESENSE_READY } from './typesense/client'
+import InsightsDashboard from './InsightsDashboard'
 import { buildSearchQuery, getFacetOptions, buildFilterBy } from './typesense/helpers'
 
 
@@ -44,6 +45,25 @@ const SORT_OPTIONS = [
   { label: 'Rating', value: 'rating_desc' },
   { label: 'Soonest departure', value: 'startDate_asc' },
 ]
+
+function getSortBy(selectedSort, currency) {
+  switch (selectedSort) {
+    case 'price_asc':
+      return `lowestPrice.${currency}.price:asc`
+    case 'price_desc':
+      return `lowestPrice.${currency}.price:desc`
+    case 'duration_asc':
+      return 'duration:asc'
+    case 'duration_desc':
+      return 'duration:desc'
+    case 'rating_desc':
+      return 'reviewRating:desc'
+    case 'startDate_asc':
+      return 'startDate:asc'
+    default:
+      return '_text_match:desc'
+  }
+}
 
 const SEARCH_FIELDS =
   'name,primaryCountry,destinations,locations,marketingRegions,themes,styles'
@@ -181,18 +201,6 @@ async function trackDepartureEvent(eventType, trip, searchQuery) {
   }
 }
 
-async function fetchMostClickedTrips() {
-  const result = await client.collections('departure_events').documents().search({
-    q: '*',
-    query_by: 'tripName,productCode,query',
-    filter_by: 'eventType:=click',
-    facet_by: 'productCode',
-    max_facet_values: 10,
-    per_page: 0,
-  })
-
-  console.log('Most clicked trip productCode counts:', result.facet_counts)
-}
 
 // Typesense helpers moved to ./typesense/helpers.js
 
@@ -246,24 +254,7 @@ function ProductSearchPage({ selectedCurrency }) {
   const [curationMetadata, setCurationMetadata] = useState(null)
 
   const adjustedSortBy = useMemo(() => {
-    switch (sortBy) {
-      case 'relevance':
-        return '_text_match:desc'
-      case 'price_asc':
-        return `lowestPrice.${selectedCurrency}.price:asc`
-      case 'price_desc':
-        return `lowestPrice.${selectedCurrency}.price:desc`
-      case 'duration_asc':
-        return 'duration:asc'
-      case 'duration_desc':
-        return 'duration:desc'
-      case 'rating_desc':
-        return 'reviewRating:desc'
-      case 'startDate_asc':
-        return 'startDate:asc'
-      default:
-        return '_text_match:desc'
-    }
+    return getSortBy(sortBy, selectedCurrency)
   }, [sortBy, selectedCurrency])
 
   const marketingRegionOptions = useMemo(() => {
@@ -362,20 +353,46 @@ function ProductSearchPage({ selectedCurrency }) {
       }
 
       try {
+        const isRelevanceSort = sortBy === 'relevance'
         const baseParams = {
-          ...buildSearchQuery(query, adjustedSortBy, appliedFilters, selectedCurrency),
+          ...buildSearchQuery(query, '_text_match:desc', appliedFilters, selectedCurrency),
           facet_by: 'marketingRegions,styles,themes,physicalRating,productId',
           max_facet_values: 2000,
           per_page: SEARCH_PAGE_SIZE,
+          enable_curations: isRelevanceSort,
         }
 
-        const response = await client
-          .collections(TYPESENSE_COLLECTION)
-          .documents()
-          .search({
-            ...baseParams,
-            page: 1,
-          })
+        if (!isRelevanceSort) {
+          baseParams.sort_by = adjustedSortBy
+        }
+
+        let response
+        try {
+          response = await client
+            .collections(TYPESENSE_COLLECTION)
+            .documents()
+            .search({
+              ...baseParams,
+              page: 1,
+            })
+        } catch (searchError) {
+          const errorMessage = String(searchError?.message || '')
+          const isSortError = /sort_by|sort by|field .* not found|could not find a field/i.test(errorMessage)
+          if (!isRelevanceSort && isSortError) {
+            console.warn('Sort error, falling back to relevance:', errorMessage)
+            response = await client
+              .collections(TYPESENSE_COLLECTION)
+              .documents()
+              .search({
+                ...baseParams,
+                enable_curations: true,
+                sort_by: '_text_match:desc',
+                page: 1,
+              })
+          } else {
+            throw searchError
+          }
+        }
 
         console.log('Typesense search result:', response)
 
@@ -383,12 +400,16 @@ function ProductSearchPage({ selectedCurrency }) {
           return
         }
 
-        const metadata =
-          response.metadata ??
-          response.curated_metadata ??
-          response.curation_metadata ??
-          response.search_cutoff_metadata
-        setCurationMetadata(metadata || null)
+        if (isRelevanceSort) {
+          const metadata =
+            response.metadata ??
+            response.curated_metadata ??
+            response.curation_metadata ??
+            response.search_cutoff_metadata
+          setCurationMetadata(metadata || null)
+        } else {
+          setCurationMetadata(null)
+        }
 
         const firstHits = Array.isArray(response.hits) ? response.hits : []
         const found = Number(response.found ?? firstHits.length)
@@ -1591,6 +1612,7 @@ function ProductDetailPage({ selectedCurrency }) {
   )
 }
 
+
 function App() {
   const [selectedRegion, setSelectedRegion] = useState('Germany')
 
@@ -1617,6 +1639,7 @@ function App() {
             <Link to="/">Ways to travel</Link>
             <Link to="/">Deals</Link>
             <Link to="/">About</Link>
+            <Link to="/insights">Insights</Link>
           </nav>
 
           <div className="topbar-actions">
@@ -1652,6 +1675,18 @@ function App() {
         <Routes>
           <Route path="/" element={<ProductSearchPage selectedCurrency={selectedCurrency} />} />
           <Route path="/product/:productId" element={<ProductDetailPage selectedCurrency={selectedCurrency} />} />
+          <Route
+            path="/insights"
+            element={
+              <InsightsDashboard
+                selectedRegion={selectedRegion}
+                selectedCurrency={selectedCurrency}
+                regionOptions={REGION_CONFIG}
+                onRegionChange={setSelectedRegion}
+                collectionName={TYPESENSE_COLLECTION}
+              />
+            }
+          />
         </Routes>
 
         <section className="region-selector" aria-label="Select region">
