@@ -66,6 +66,6 @@ app.get("/health", (req, res) => res.json({ status: "ok" }));
 app.listen(PORT, () => {
   console.log(`Backend running on http://localhost:${PORT}`);
   console.log(
-    `SSR search endpoint: http://localhost:${PORT}/api/search?q=italy`,
+    `SSR search endpoint: http://localhost:${PORT}/api/search`,
   );
 });
