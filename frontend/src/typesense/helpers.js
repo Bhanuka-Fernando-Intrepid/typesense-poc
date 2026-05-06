@@ -26,9 +26,8 @@ export function buildFilterBy(selectedFilters, selectedCurrency) {
   }
 
   if (Array.isArray(selectedFilters.styles) && selectedFilters.styles.length > 0) {
-    selectedFilters.styles.forEach((value) => {
-      clauses.push(`styles:=[\`${escapeBackticks(value)}\`]`)
-    })
+    const vals = selectedFilters.styles.map((v) => `\`${escapeBackticks(v)}\``).join(',')
+    clauses.push(`styles:=[${vals}]`)
   }
 
   if (Array.isArray(selectedFilters.themes) && selectedFilters.themes.length > 0) {

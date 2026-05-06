@@ -46,6 +46,12 @@ const SORT_OPTIONS = [
   { label: 'Soonest departure', value: 'startDate_asc' },
 ]
 
+const EMPTY_SEARCH_PINNED_HITS = [
+  { id: '2802734', position: 1 },
+  { id: '2802735', position: 2 },
+  { id: '2802736', position: 3 },
+]
+
 function getSortBy(selectedSort, currency) {
   switch (selectedSort) {
     case 'price_asc':
@@ -252,6 +258,7 @@ function ProductSearchPage({ selectedCurrency }) {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
   const [curationMetadata, setCurationMetadata] = useState(null)
+  const [emptySearchMerchandising, setEmptySearchMerchandising] = useState(false)
 
   const adjustedSortBy = useMemo(() => {
     return getSortBy(sortBy, selectedCurrency)
@@ -353,17 +360,38 @@ function ProductSearchPage({ selectedCurrency }) {
       }
 
       try {
+        const normalizedQuery = query.trim()
+        const hasSearchQuery = normalizedQuery.length > 0
         const isRelevanceSort = sortBy === 'relevance'
+        const shouldUseEmptyPinnedHits =
+          !hasSearchQuery && emptySearchMerchandising && isRelevanceSort
+        const filterBy = buildFilterBy(appliedFilters, selectedCurrency)
+
+        const qlen = hasSearchQuery ? normalizedQuery.length : 0
+        let numTypos = 0
+        if (qlen >= 5) numTypos = 2
+        else if (qlen >= 3) numTypos = 1
+
         const baseParams = {
-          ...buildSearchQuery(query, '_text_match:desc', appliedFilters, selectedCurrency),
+          q: hasSearchQuery ? normalizedQuery : '*',
+          query_by: SEARCH_FIELDS,
+          filter_by: filterBy || undefined,
           facet_by: 'marketingRegions,styles,themes,physicalRating,productId',
           max_facet_values: 2000,
           per_page: SEARCH_PAGE_SIZE,
-          enable_curations: isRelevanceSort,
+          enable_curations: hasSearchQuery && isRelevanceSort,
+          num_typos: numTypos,
+        }
+
+        if (shouldUseEmptyPinnedHits) {
+          baseParams.pinned_hits = EMPTY_SEARCH_PINNED_HITS
+            .map((item) => `${item.id}:${item.position}`)
+            .join(',')
         }
 
         if (!isRelevanceSort) {
-          baseParams.sort_by = adjustedSortBy
+          const sortValue = getSortBy(sortBy, selectedCurrency)
+          if (sortValue) baseParams.sort_by = sortValue
         }
 
         let response
@@ -385,7 +413,7 @@ function ProductSearchPage({ selectedCurrency }) {
               .documents()
               .search({
                 ...baseParams,
-                enable_curations: true,
+                enable_curations: hasSearchQuery,
                 sort_by: '_text_match:desc',
                 page: 1,
               })
@@ -400,7 +428,7 @@ function ProductSearchPage({ selectedCurrency }) {
           return
         }
 
-        if (isRelevanceSort) {
+        if (hasSearchQuery && isRelevanceSort) {
           const metadata =
             response.metadata ??
             response.curated_metadata ??
@@ -484,7 +512,7 @@ function ProductSearchPage({ selectedCurrency }) {
       isActive = false
       window.clearTimeout(timer)
     }
-  }, [query, adjustedSortBy, appliedFilters, selectedCurrency])
+  }, [query, adjustedSortBy, appliedFilters, selectedCurrency, emptySearchMerchandising, sortBy])
 
   // Suggestions fetching (debounced shorter than main search)
   useEffect(() => {
@@ -749,6 +777,7 @@ function ProductSearchPage({ selectedCurrency }) {
               value={query}
               onChange={(event) => {
                 setQuery(event.target.value)
+                setEmptySearchMerchandising(false)
               }}
               onKeyDown={(e) => {
                 if (!showSuggestions || suggestions.length === 0) return
@@ -782,6 +811,8 @@ function ProductSearchPage({ selectedCurrency }) {
                   setQuery('')
                   setSuggestions([])
                   setShowSuggestions(false)
+                  setEmptySearchMerchandising(false)
+                  setCurationMetadata(null)
                 }}
               >
                 ×
@@ -841,7 +872,14 @@ function ProductSearchPage({ selectedCurrency }) {
                     </div>
                   </div>
 
-          <button type="button" className="search-button" onClick={() => { /* visual-only, main search reacts to query */ }}>
+          <button
+            type="button"
+            className="search-button"
+            onClick={() => {
+              const isEmpty = query.trim().length === 0
+              setEmptySearchMerchandising(isEmpty)
+            }}
+          >
             <span>Search</span>
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path
