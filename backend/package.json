@@ -32,7 +32,6 @@
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
-    "morgan": "^1.10.1",
     "typesense": "^3.0.6"
   },
   "devDependencies": {
